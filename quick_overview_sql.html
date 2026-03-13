@@ -1,0 +1,3530 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.42">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>SQL A Quick Introduction</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="quick_overview_sql_files/libs/clipboard/clipboard.min.js"></script>
+<script src="quick_overview_sql_files/libs/quarto-html/quarto.js"></script>
+<script src="quick_overview_sql_files/libs/quarto-html/popper.min.js"></script>
+<script src="quick_overview_sql_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="quick_overview_sql_files/libs/quarto-html/anchor.min.js"></script>
+<link href="quick_overview_sql_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="quick_overview_sql_files/libs/quarto-html/quarto-syntax-highlighting-2f5df379a58b258e96c21c0638c20c03.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="quick_overview_sql_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="quick_overview_sql_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="quick_overview_sql_files/libs/bootstrap/bootstrap-1bc8a17f135ab3d594c857e9f48e611b.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">SQL A Quick Introduction</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="introduction" class="level1">
+<h1>Introduction</h1>
+<section id="database" class="level2">
+<h2 class="anchored" data-anchor-id="database">DATABASE</h2>
+<ul>
+<li>There are mainly two type of database
+<ol type="1">
+<li><p>Relational:<br>
+Tables in relational database resemble Excel spreadsheets (Rows and Columns). Tables in relational database can have relation to each others and it is done by the concept <code>keys</code>.</p></li>
+<li><p>Non-Relational:&nbsp; Data can be organized in any format but not a table (non-tabular form, and tends to be more flexible than SQL-based) like <a href="https://www.w3schools.com/js/js_json_intro.asp">JSON</a> files (It is a collection of key-value pairs where the key must be a string type, and the value can be of any of the following types: Number, String.)<br>
+Example of some simple JSON data</p></li>
+</ol></li>
+</ul>
+<div class="cell" data-layout-align="center">
+<p>{ “course”: “DATA613”, “level”: “Graduate”, “credit”: 3 }</p>
+</div>
+<p>To utilize data in a relational database we use <code>SQL</code> and for non-relational we use another language called <a href="https://riak.com/resources/nosql-databases/index.html?p=9937.html"><code>NOSQL</code></a> (Not Only SQL). <code>NOSQL</code> databases use <code>JSON</code> (JavaScript Object Notation), <a href="https://www.w3schools.com/xml/xml_whatis.asp">XML</a>, <a href="https://www.cloudbees.com/blog/yaml-tutorial-everything-you-need-get-started">YAML</a>, or binary schema, facilitating unstructured data. Our focus here is on SQL!</p>
+</section>
+<section id="sql" class="level2">
+<h2 class="anchored" data-anchor-id="sql">SQL</h2>
+<p>SQL is a database query language - a language designed specifically for interacting with a database. It offers syntax for extracting data, updating data, replacing data, creating data, etc. For our purposes, it will typically be used when accessing data off a server database. If the database isn’t too large, you can grab the entire data set and stick it in a data.frame. However, often the data are quite large so you interact with it piecemeal via SQL.</p>
+<ul>
+<li><p>SQL is how you download this subset. You choose which data frames (“tables” in SQL) to download, what subsets of these tables to download (by filtering rows), and whether to join tables together in this process.</p></li>
+<li><p>SQL allows you to do a lot that {dplr} does. It is industry standard for interacting with a relational database.</p></li>
+<li><p>One of the nice advantage of SQL is, you do not need to export data from the database into a file and then load it into R. And have to redo it again each time the data is updated. With SQL, we can get our code directly and get the most recent data straight out of the database.</p></li>
+<li><p>To work with relational database system we need special software known as a DataBase Management System (DBMS). It is a workspace for us to write SQL statement. There are different DBMS that you can use. For instance</p>
+<ul>
+<li><p>MYSQL</p></li>
+<li><p>Microsoft SQL Server</p></li>
+<li><p>Oracle</p></li>
+<li><p>Postgres SQL</p></li>
+<li><p>and may more.</p>
+<p>The method of connecting with each database may differ, but they support SQL (specifically they support ANSI SQL). If you get familiar with one of these DBMS then transition from one server to another is not very hard.</p></li>
+</ul></li>
+<li><p>We will use R Studio in this lesson. But if you get really into SQL, a popular IDE is <a href="https://dbeaver.io/">DBeaver</a> , with a tutorial from DuckDB <a href="https://duckdb.org/docs/guides/sql_editors/dbeaver#how-to-set-up-dbeaver-sql-ide-for-duckdb">here</a> .</p>
+<ul>
+<li><p>The first step in using SQL is accessing the actual data. There are a few packages that might be useful in connecting</p>
+<ul>
+<li><a href="https://cran.r-project.org/web/packages/DBI/index.html">DBI</a></li>
+<li><a href="https://cran.r-project.org/web/packages/RODBC/index.html">RODBC</a></li>
+<li><a href="https://cran.r-project.org/web/packages/dbConnect/index.html">dbConnect</a></li>
+<li><a href="https://cran.r-project.org/web/packages/RSQLite/index.html">RSQLite</a></li>
+<li><a href="https://cran.r-project.org/web/packages/RMySQL/index.html">RMySQL</a></li>
+<li><a href="https://cran.r-project.org/web/packages/RPostgreSQL/index.html">RPostgreSQL</a></li>
+</ul></li>
+</ul></li>
+</ul>
+</section>
+</section>
+<section id="sql-for-database-management" class="level1">
+<h1>SQL for Database Management</h1>
+<p>A <strong>DBMS (Database Management System)</strong> is software that allows users to efficiently store, manage, and query data in databases. Important ones include <strong>MySQL</strong>, <strong>PostgreSQL</strong>, <strong>SQL Server</strong>, <strong>Oracle</strong>, and <strong>SQLite</strong>.</p>
+<p><strong>DBMS tools</strong> are software applications used to manage and interact with databases. Important ones include <strong>DBeaver</strong>, <strong>MySQL,</strong> ,and <strong>Oracle SQL Developer</strong>.</p>
+<p><strong>Database Management Focus</strong>: DBM tools are specifically designed for <strong>database management</strong> tasks, such as:</p>
+<ul>
+<li><p>Structuring and managing data.</p></li>
+<li><p>Writing and testing SQL queries.</p></li>
+<li><p>Performing tasks like joining tables, filtering, and data manipulation directly within the database, rather than relying on R’s code-based approach.</p></li>
+</ul>
+<section id="what-is-dbeaver" class="level3">
+<h3 class="anchored" data-anchor-id="what-is-dbeaver">What is DBeaver?</h3>
+<ul>
+<li><p><strong>DBeaver</strong> is an open-source, cross-platform database management tool designed for working with <strong>SQL databases</strong> and <strong>NoSQL databases</strong>.</p></li>
+<li><p>It provides a <strong>graphical interface</strong> to interact with databases, making it easy to manage and explore data, run SQL queries, and generate <strong>ER diagrams</strong> to visualize database structure.</p></li>
+<li><p>DBeaver supports a wide range of databases and provides tools for <strong>SQL editing</strong>, <strong>query execution</strong>, <strong>data browsing</strong>, <strong>schema management</strong>, and <strong>database administration</strong>.</p></li>
+<li><p>It’s an ideal tool for both <strong>beginners</strong> learning SQL and <strong>advanced users</strong> working with complex databases.</p></li>
+</ul>
+</section>
+<section id="sql-in-r" class="level2">
+<h2 class="anchored" data-anchor-id="sql-in-r">SQL In R</h2>
+<ul>
+<li><p><strong>Note:</strong> In this class we learn</p></li>
+<li><p>Interface SQL with R through the <code>{DBI}</code> package.</p></li>
+<li><p>Write SQL code using the tidyverse and the <code>{dbplyr}</code> package.</p></li>
+</ul>
+</section>
+<section id="install-and-load-necessary-packages" class="level2">
+<h2 class="anchored" data-anchor-id="install-and-load-necessary-packages">Install and Load necessary packages</h2>
+<section id="dbi-package" class="level3">
+<h3 class="anchored" data-anchor-id="dbi-package">{DBI} Package</h3>
+<p>The first package we load is {DBI}, it is the basic database infrastructure. It let’s R to talk to lots of different kind of dadtabases and perform required tasks.</p>
+<ul>
+<li><p><strong>{DBI}</strong> – Acts as a bridge between R and databases, providing a consistent way to connect and send queries.</p></li>
+<li><p><strong>{DBI}</strong> lets R talk to DuckDB.</p></li>
+</ul>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(DBI)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="duckdb" class="level3">
+<h3 class="anchored" data-anchor-id="duckdb">{duckdb}:</h3>
+<p>It tells {DBI} package translate between R and database. There are other related packages for translating between R and other database management system like {duckdb} or {RSQLite}.</p>
+<ul>
+<li><p><strong>{duckdb}</strong> – A fast, in-memory database that processes SQL queries efficiently without requiring an external database server.</p></li>
+<li><p><strong>{duckdb}</strong> executes SQL queries efficiently.</p></li>
+</ul>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(duckdb)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="dbplyr" class="level2">
+<h2 class="anchored" data-anchor-id="dbplyr">{dbplyr}:</h2>
+<p>If we want to interact with database directly using {dplyr} we need to load {dbplyr} (database plyr package). That will allow {dplyr} and databases to interact by using the package {DBI}.</p>
+<ul>
+<li><p><strong>{dplyr}</strong> – Allows users to manipulate data using R functions instead of writing raw SQL, making database operations easier.</p></li>
+<li><p><strong>{dplyr}</strong> enables SQL-like operations in R without writing SQL directly.</p></li>
+</ul>
+</section>
+</section>
+<section id="an-overview-example-showing-how-dplyr-allows-you-to-perform-sql-queries." class="level1">
+<h1>An overview example showing how <code>{dplyr}</code> allows you to perform <code>SQL</code> queries.</h1>
+<section id="scenario" class="level3">
+<h3 class="anchored" data-anchor-id="scenario">Scenario:</h3>
+<p>Suppose you have a <code>data.frame</code> in R with sales data, and you want to:</p>
+<ul>
+<li><p>Filter rows where the sales are greater than $100.</p></li>
+<li><p>Group the data by <code>region</code>.</p></li>
+<li><p>Calculate the average sales per region.</p></li>
+</ul>
+<p>When you’re working with a database connection, <strong>{dplyr}</strong> automatically detects that you’re using a database and translates its functions (like <code>filter()</code>, <code>group_by()</code>, etc.) into SQL queries instead of running them in-memory as it would with a local <code>data.frame</code>.</p>
+</section>
+<section id="heres-how-the-connection-and-detection-process-works" class="level3">
+<h3 class="anchored" data-anchor-id="heres-how-the-connection-and-detection-process-works">Here’s how the connection and detection process works:</h3>
+<ol type="1">
+<li><strong>Set up the connection</strong> with <strong>{DBI}</strong> and <strong>{duckdb}</strong>:</li>
+</ol>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Connect to DuckDB (this creates an in-memory database)</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>dbcon <span class="ot">&lt;-</span> <span class="fu">dbConnect</span>(duckdb<span class="sc">::</span><span class="fu">duckdb</span>()) </span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>dbcon</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>&lt;duckdb_connection f9b90 driver=&lt;duckdb_driver dbdir=':memory:' read_only=FALSE bigint=numeric&gt;&gt;</code></pre>
+</div>
+</div>
+<ol start="2" type="1">
+<li><strong>Create a table in DuckDB</strong> (optional, if you want to work with an actual database table):</li>
+</ol>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Sample data frame</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>sales_data <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">region =</span> <span class="fu">c</span>(<span class="st">"North"</span>, <span class="st">"South"</span>, <span class="st">"East"</span>, <span class="st">"West"</span>, <span class="st">"North"</span>, <span class="st">"South"</span>),</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">sales =</span> <span class="fu">c</span>(<span class="dv">150</span>, <span class="dv">120</span>, <span class="dv">90</span>, <span class="dv">200</span>, <span class="dv">300</span>, <span class="dv">80</span>)</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(sales_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 6 2</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(sales_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 6
+Columns: 2
+$ region &lt;chr&gt; "North", "South", "East", "West", "North", "South"
+$ sales  &lt;dbl&gt; 150, 120, 90, 200, 300, 80</code></pre>
+</div>
+</div>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Copy the data into DuckDB</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">dbWriteTable</span>(dbcon, <span class="st">"sales"</span>, sales_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check if the connection is established</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">dbIsValid</span>(dbcon)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] TRUE</code></pre>
+</div>
+</div>
+<ol start="3" type="1">
+<li><strong>Use {dplyr} to query the database</strong>:</li>
+</ol>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Now use dplyr to interact with the database</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    result <span class="ot">&lt;-</span> <span class="fu">tbl</span>(dbcon, <span class="st">"sales"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>      <span class="fu">filter</span>(sales <span class="sc">&gt;</span> <span class="dv">100</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>      <span class="fu">group_by</span>(region) <span class="sc">%&gt;%</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>      <span class="fu">summarise</span>(<span class="at">avg_sales =</span> <span class="fu">mean</span>(sales))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a> <span class="co"># Show the result</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">print</span>(result)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Missing values are always removed in SQL aggregation functions.
+Use `na.rm = TRUE` to silence this warning
+This warning is displayed once every 8 hours.</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code># Source:   SQL [?? x 2]
+# Database: DuckDB v1.3.1 [semiyari@Windows 10 x64:R 4.5.2/:memory:]
+  region avg_sales
+  &lt;chr&gt;      &lt;dbl&gt;
+1 North        225
+2 West         200
+3 South        120</code></pre>
+</div>
+</div>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(result)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] NA  2</code></pre>
+</div>
+</div>
+</section>
+<section id="what-happens-behind-the-scenes" class="level3">
+<h3 class="anchored" data-anchor-id="what-happens-behind-the-scenes">What happens behind the scenes:</h3>
+<ul>
+<li><p>The <strong><code>tbl()</code></strong> function tells <strong>{dplyr}</strong> to treat the <code>"sales"</code> table as a database object (not a local <code>data.frame</code>).</p></li>
+<li><p>Once <strong>{dplyr}</strong> detects the connection (<code>dbcon</code>), it automatically knows you’re working with a database and will translate the <code>filter()</code>, <code>group_by()</code>, and <code>summarise()</code> operations into the appropriate <strong>SQL</strong> commands instead of running them in R.</p></li>
+</ul>
+<p>For instance, the query for the above operation would look something like this in SQL: <mark style="background-color: #e24e2f">SQL</mark></p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> region, <span class="fu">AVG</span>(sales) <span class="kw">AS</span> avg_sales</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> sales</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> sales <span class="op">&gt;</span> <span class="dv">100</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> region</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>3 records</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">region</th>
+<th style="text-align: right;">avg_sales</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">North</td>
+<td style="text-align: right;">225</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">West</td>
+<td style="text-align: right;">200</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">South</td>
+<td style="text-align: right;">120</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="how-does-dplyr-know" class="level3">
+<h3 class="anchored" data-anchor-id="how-does-dplyr-know">How does <strong>{dplyr}</strong> know?</h3>
+<ul>
+<li><p>The <strong><code>tbl()</code></strong> function is the key. When you provide a <strong>database connection</strong> as an argument, <strong>{dplyr}</strong> recognizes that it should interact with the database and generate SQL queries.</p></li>
+<li><p>If you were using a local <code>data.frame</code>, it would just run the operations in R, not SQL.</p></li>
+</ul>
+<p>So, <strong>{dplyr}</strong> translates your R code to SQL under the hood when it detects that you’re working with a database connection.</p>
+</section>
+<section id="closing-the-connection" class="level3">
+<h3 class="anchored" data-anchor-id="closing-the-connection">Closing the connection</h3>
+<p>We are done with this example so we need to close the connection.</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Close the previous connection if it is open</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">dbIsValid</span>(dbcon)) {</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">dbDisconnect</span>(dbcon)</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"Previous connection closed."</span>)</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> {</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"No active connection to close."</span>)</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Previous connection closed.</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="another-example" class="level1">
+<h1>Another Example:</h1>
+<section id="connecting-using-duckdb" class="level3">
+<h3 class="anchored" data-anchor-id="connecting-using-duckdb">Connecting using {duckdb}</h3>
+<p>Let’s download a duck database from: <a href="https://data-science-master.github.io/lectures/data/flights.duckdb" class="uri">https://data-science-master.github.io/lectures/data/flights.duckdb</a></p>
+<pre><code>&lt;mark style="background-color: lightblue"&gt;R&lt;/mark&gt;</code></pre>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Download the DuckDB file from the provided URL</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>url <span class="ot">&lt;-</span> <span class="st">"https://data-science-master.github.io/lectures/data/flights.duckdb"</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a><span class="fu">download.file</span>(url, <span class="at">destfile =</span> <span class="st">"./data/flights.duckdb"</span>, <span class="at">mode =</span> <span class="st">"wb"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<ul>
+<li><p>The first argument is the driver from {duckdb} that helps translate between R and the database. The driver is loaded using the <code>duckdb()</code> function.</p></li>
+<li><p>The second argument is the path to our database file.</p>
+<p><mark style="background-color: lightblue">R</mark></p></li>
+</ul>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>    conn <span class="ot">&lt;-</span> <span class="fu">dbConnect</span>(<span class="fu">duckdb</span>(), <span class="st">"../data/flights.duckdb"</span>, <span class="at">read_only =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="check-the-connection" class="level3">
+<h3 class="anchored" data-anchor-id="check-the-connection">Check the Connection</h3>
+<ul>
+<li><p>If you look at the “environment pane” you will see the “Formal class duckdb_connect…” This means we have connected to this database.</p></li>
+<li><p>To check if the connection is closed use the <code>dbIsValid()</code> function in R. This function returns TRUE if the connection is valid (open) and FALSE if it is closed.</p>
+<p><mark style="background-color: lightblue">R</mark></p></li>
+</ul>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>    <span class="fu">dbIsValid</span>(conn)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] TRUE</code></pre>
+</div>
+</div>
+</section>
+<section id="basic-operations" class="level3">
+<h3 class="anchored" data-anchor-id="basic-operations">Basic Operations:</h3>
+<ul>
+<li><p>Once we connected to database we can look at it to see what is going on by using <code>dbListTables()</code>, where the argument is the connection object we made. It will shows the tables we have in this database. The warning message says when finishing with your work you must disconnect.</p>
+<p><mark style="background-color: lightblue">R</mark></p></li>
+</ul>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>    <span class="fu">dbListTables</span>(conn)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "airlines" "airports" "flights"  "planes"   "weather" </code></pre>
+</div>
+</div>
+<ul>
+<li><p>We also can find out the details of the individual tables by <code>dbListFields()</code>, where the first argument is the connection we made and the seconf wrapped in qutation is the name of the table that we are interested in</p>
+<p><mark style="background-color: lightblue">R</mark></p></li>
+</ul>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>    <span class="fu">dbListFields</span>(conn, <span class="st">"flights"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] "year"           "month"          "day"            "dep_time"      
+ [5] "sched_dep_time" "dep_delay"      "arr_time"       "sched_arr_time"
+ [9] "arr_delay"      "carrier"        "flight"         "tailnum"       
+[13] "origin"         "dest"           "air_time"       "distance"      
+[17] "hour"           "minute"         "time_hour"     </code></pre>
+</div>
+</div>
+<pre><code>&lt;mark style="background-color: lightblue"&gt;R&lt;/mark&gt;</code></pre>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>    <span class="fu">dbListFields</span>(conn, <span class="st">"planes"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "tailnum"      "year"         "type"         "manufacturer" "model"       
+[6] "engines"      "seats"        "speed"        "engine"      </code></pre>
+</div>
+</div>
+<pre><code>&lt;mark style="background-color: lightblue"&gt;R&lt;/mark&gt;</code></pre>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>    <span class="fu">dbListFields</span>(conn, <span class="st">"airports"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "faa"   "name"  "lat"   "lon"   "alt"   "tz"    "dst"   "tzone"</code></pre>
+</div>
+</div>
+<ul>
+<li><p>In addition to looking at a table in a dataframe we can also make direct connections to those individual tables and we can do that using <code>tbl()</code> from {dplyr}.</p></li>
+<li><p>Let’s assume we want to make a connect link to “airports” table via <code>tbl()</code> from <code>{dplyr}</code></p>
+<p><mark style="background-color: lightblue">R</mark></p></li>
+</ul>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tbl</span>(conn, <span class="st">"airports"</span>) <span class="ot">-&gt;</span> airports</span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>    airports</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># Source:   table&lt;airports&gt; [?? x 8]
+# Database: DuckDB v1.3.1 [semiyari@Windows 10 x64:R 4.5.2/C:\Users\semiyari\Desktop\ds_spring26\data\flights.duckdb]
+   faa   name                             lat    lon   alt    tz dst   tzone    
+   &lt;chr&gt; &lt;chr&gt;                          &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt;    
+ 1 04G   Lansdowne Airport               41.1  -80.6  1044    -5 A     America/…
+ 2 06A   Moton Field Municipal Airport   32.5  -85.7   264    -6 A     America/…
+ 3 06C   Schaumburg Regional             42.0  -88.1   801    -6 A     America/…
+ 4 06N   Randall Airport                 41.4  -74.4   523    -5 A     America/…
+ 5 09J   Jekyll Island Airport           31.1  -81.4    11    -5 A     America/…
+ 6 0A9   Elizabethton Municipal Airport  36.4  -82.2  1593    -5 A     America/…
+ 7 0G6   Williams County Airport         41.5  -84.5   730    -5 A     America/…
+ 8 0G7   Finger Lakes Regional Airport   42.9  -76.8   492    -5 A     America/…
+ 9 0P2   Shoestring Aviation Airfield    39.8  -76.6  1000    -5 U     America/…
+10 0S9   Jefferson County Intl           48.1 -123.    108    -8 A     America/…
+# ℹ more rows</code></pre>
+</div>
+</div>
+<ul>
+<li>if you look at the the output you will see the number of rows is unknown.</li>
+</ul>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>airports <span class="sc">%&gt;%</span> </span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">nrow</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] NA</code></pre>
+</div>
+</div>
+<ul>
+<li><p>You will see something like <code>[??,8]</code> which indicates <code>??</code> rows and <code>8</code> columns. This is because R does not have the entire table. it only knows the first 10 rows as you can see from the output of the previous command.</p></li>
+<li><p>However, if you click the “airports” objects in the “environment” pane you will see some confusing output.</p></li>
+</ul>
+<p><img src="./graphix/sql1.png" class="img-fluid"></p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="fu">View</span>(airports)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>If we want to bring this table to R we need to use <code>collect()</code> function</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>airports <span class="sc">|&gt;</span> </span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect</span>() <span class="ot">-&gt;</span></span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>  df_airports</span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>df_airports</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1,458 × 8
+   faa   name                             lat    lon   alt    tz dst   tzone    
+   &lt;chr&gt; &lt;chr&gt;                          &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt;    
+ 1 04G   Lansdowne Airport               41.1  -80.6  1044    -5 A     America/…
+ 2 06A   Moton Field Municipal Airport   32.5  -85.7   264    -6 A     America/…
+ 3 06C   Schaumburg Regional             42.0  -88.1   801    -6 A     America/…
+ 4 06N   Randall Airport                 41.4  -74.4   523    -5 A     America/…
+ 5 09J   Jekyll Island Airport           31.1  -81.4    11    -5 A     America/…
+ 6 0A9   Elizabethton Municipal Airport  36.4  -82.2  1593    -5 A     America/…
+ 7 0G6   Williams County Airport         41.5  -84.5   730    -5 A     America/…
+ 8 0G7   Finger Lakes Regional Airport   42.9  -76.8   492    -5 A     America/…
+ 9 0P2   Shoestring Aviation Airfield    39.8  -76.6  1000    -5 U     America/…
+10 0S9   Jefferson County Intl           48.1 -123.    108    -8 A     America/…
+# ℹ 1,448 more rows</code></pre>
+</div>
+</div>
+<p>Now, if you click on <code>df_airports</code> in the ‘Environment’ pane, you will see exactly what you would expect from <code>read_csv()</code>, including a ‘<code>$</code>’ sign followed by the variable name, the type of the variables, and more.</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="fu">View</span>(df_airports)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="running-sql-from-r" class="level1">
+<h1>Running SQL From R</h1>
+<p>We can interact with the data in a database that we ’ve made a connection to.</p>
+<ul>
+<li><p>We want to learn how to write queries in <code>SQL</code>. If we want to interact with a database from R based on those queries, we start by writing the query as a <strong>string</strong>.</p></li>
+<li><p><strong>Therefore, the query must be enclosed in quotation marks.</strong></p></li>
+<li><p>A basic SQL code chunk looks like this (put SQL code between the chunks):</p></li>
+</ul>
+<div class="cell" data-layout-align="center">
+<div class="cell-output cell-output-stdout">
+<pre><code>```{sql, connection=conn}
+
+```</code></pre>
+</div>
+</div>
+<ul>
+<li>By convention, SQL syntax is written in all UPPER CASE and variable names/database names are written in lower case.</li>
+</ul>
+<section id="select-specific-columns" class="level3">
+<h3 class="anchored" data-anchor-id="select-specific-columns">Select Specific Columns</h3>
+<p>As you can see, the following query:</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="st">"SELECT tzone, name</span></span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a><span class="st"> FROM airports"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "SELECT tzone, name\n FROM airports"</code></pre>
+</div>
+</div>
+<p>is inside quotation marks in the above chunk of code.</p>
+</section>
+<section id="there-are-three-ways-to-run-this-query" class="level3">
+<h3 class="anchored" data-anchor-id="there-are-three-ways-to-run-this-query">There are three ways to run this query</h3>
+<section id="dbgetquery-from-dbi" class="level4">
+<h4 class="anchored" data-anchor-id="dbgetquery-from-dbi">1. <code>dbGetQuery()</code> From <code>DBI</code></h4>
+<ul>
+<li><p>Use the function <code>dbGetQuery()</code> from {DBI} package.</p></li>
+<li><p>Now let us run <code>dbGetQuery()</code> function</p>
+<p><mark style="background-color: lightblue">R</mark></p></li>
+</ul>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a>    <span class="st">"SELECT tzone, name</span></span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a><span class="st">     FROM airports"</span> <span class="sc">%&gt;%</span> </span>
+<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a>      <span class="fu">dbGetQuery</span>(conn, .) <span class="ot">-&gt;</span></span>
+<span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a>      tz_name</span>
+<span id="cb48-5"><a href="#cb48-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">head</span>(tz_name)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>             tzone                           name
+1 America/New_York              Lansdowne Airport
+2  America/Chicago  Moton Field Municipal Airport
+3  America/Chicago            Schaumburg Regional
+4 America/New_York                Randall Airport
+5 America/New_York          Jekyll Island Airport
+6 America/New_York Elizabethton Municipal Airport</code></pre>
+</div>
+</div>
+<p><strong>As you can see, the query is inside quotation marks.</strong></p>
+<p>It will get run in database, select the two columns that we have requested from the table we have provided. So this is actually a dataframe that was passed back to R and if we store it , then it will be ready when we need it.</p>
+<p><mark style="background-color: lightblue">R</mark></p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(tz_name)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 1458</code></pre>
+</div>
+</div>
+<p><mark style="background-color: lightblue">R</mark></p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(tz_name)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "tzone" "name" </code></pre>
+</div>
+</div>
+<p><mark style="background-color: lightblue">R</mark></p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a>tz_name <span class="sc">%&gt;%</span></span>
+<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>             tzone                           name
+1 America/New_York              Lansdowne Airport
+2  America/Chicago  Moton Field Municipal Airport
+3  America/Chicago            Schaumburg Regional
+4 America/New_York                Randall Airport
+5 America/New_York          Jekyll Island Airport
+6 America/New_York Elizabethton Municipal Airport</code></pre>
+</div>
+</div>
+</section>
+<section id="tbl-from-dplyr" class="level4">
+<h4 class="anchored" data-anchor-id="tbl-from-dplyr">2. <code>tbl()</code> From <code>dplyr</code></h4>
+<section id="i-with-sql-function" class="level5">
+<h5 class="anchored" data-anchor-id="i-with-sql-function">(i) with <code>sql()</code> function</h5>
+<ul>
+<li><p>We can use <code>tbl()</code> from {dplyr}</p>
+<p><mark style="background-color: lightblue">R</mark></p></li>
+</ul>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a>    <span class="st">"SELECT tzone, name</span></span>
+<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a><span class="st">     FROM airports"</span> <span class="sc">%&gt;%</span></span>
+<span id="cb56-3"><a href="#cb56-3" aria-hidden="true" tabindex="-1"></a>      <span class="fu">sql</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb56-4"><a href="#cb56-4" aria-hidden="true" tabindex="-1"></a>      <span class="fu">tbl</span>(conn, .) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># Source:   SQL [?? x 2]
+# Database: DuckDB v1.3.1 [semiyari@Windows 10 x64:R 4.5.2/C:\Users\semiyari\Desktop\ds_spring26\data\flights.duckdb]
+   tzone               name                          
+   &lt;chr&gt;               &lt;chr&gt;                         
+ 1 America/New_York    Lansdowne Airport             
+ 2 America/Chicago     Moton Field Municipal Airport 
+ 3 America/Chicago     Schaumburg Regional           
+ 4 America/New_York    Randall Airport               
+ 5 America/New_York    Jekyll Island Airport         
+ 6 America/New_York    Elizabethton Municipal Airport
+ 7 America/New_York    Williams County Airport       
+ 8 America/New_York    Finger Lakes Regional Airport 
+ 9 America/New_York    Shoestring Aviation Airfield  
+10 America/Los_Angeles Jefferson County Intl         
+# ℹ more rows</code></pre>
+</div>
+</div>
+<p><strong>As you can see, the query is inside quotation marks.</strong></p>
+<ul>
+<li>This will create a table similar to one we had with <code>dbGetQuery()</code>. The difference is the <strong><code>dbGetQuery()</code> returns a dataframe back to R. <code>tbl()</code> function actually leaves the result table still in the database.</strong> And we can see it R does not know how many rows there. on the top of the table you will see something similar to</li>
+</ul>
+<div class="cell" data-layout-align="center">
+<p>Source:SQL [?? x 2]</p>
+</div>
+<p>Which implies R does not know the entire the table, it only knows the first 10 rows.</p>
+<p>If we want to get the result of that query back to R we need to use <code>collect()</code> function</p>
+<p><mark style="background-color: lightblue">R</mark></p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a><span class="st">"SELECT tzone, name</span></span>
+<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a><span class="st"> FROM airports"</span> <span class="sc">%&gt;%</span></span>
+<span id="cb58-3"><a href="#cb58-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sql</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb58-4"><a href="#cb58-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tbl</span>(conn, .) <span class="sc">%&gt;%</span></span>
+<span id="cb58-5"><a href="#cb58-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1,458 × 2
+   tzone               name                          
+   &lt;chr&gt;               &lt;chr&gt;                         
+ 1 America/New_York    Lansdowne Airport             
+ 2 America/Chicago     Moton Field Municipal Airport 
+ 3 America/Chicago     Schaumburg Regional           
+ 4 America/New_York    Randall Airport               
+ 5 America/New_York    Jekyll Island Airport         
+ 6 America/New_York    Elizabethton Municipal Airport
+ 7 America/New_York    Williams County Airport       
+ 8 America/New_York    Finger Lakes Regional Airport 
+ 9 America/New_York    Shoestring Aviation Airfield  
+10 America/Los_Angeles Jefferson County Intl         
+# ℹ 1,448 more rows</code></pre>
+</div>
+</div>
+<p>Now it will return the data as a datafram into R.</p>
+</section>
+<section id="ii-with-dplyrs-functions" class="level5">
+<h5 class="anchored" data-anchor-id="ii-with-dplyrs-functions">(ii) with <code>dplyr's</code> functions</h5>
+<p><mark style="background-color: lightblue">R</mark></p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tbl</span>(conn, <span class="st">"airports"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb60-2"><a href="#cb60-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(tzone, name) <span class="sc">%&gt;%</span></span>
+<span id="cb60-3"><a href="#cb60-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1,458 × 2
+   tzone               name                          
+   &lt;chr&gt;               &lt;chr&gt;                         
+ 1 America/New_York    Lansdowne Airport             
+ 2 America/Chicago     Moton Field Municipal Airport 
+ 3 America/Chicago     Schaumburg Regional           
+ 4 America/New_York    Randall Airport               
+ 5 America/New_York    Jekyll Island Airport         
+ 6 America/New_York    Elizabethton Municipal Airport
+ 7 America/New_York    Williams County Airport       
+ 8 America/New_York    Finger Lakes Regional Airport 
+ 9 America/New_York    Shoestring Aviation Airfield  
+10 America/Los_Angeles Jefferson County Intl         
+# ℹ 1,448 more rows</code></pre>
+</div>
+</div>
+<p>Once <strong>{dplyr}</strong> detects the connection (<code>conn</code>), it automatically knows you’re working with a database and will translate the <code>filter()</code>, <code>group_by()</code>, and <code>summarise()</code> operations into the appropriate <strong>SQL</strong> commands instead of running them in R.</p>
+</section>
+</section>
+<section id="use-language-sql-within-chunk-code" class="level4">
+<h4 class="anchored" data-anchor-id="use-language-sql-within-chunk-code">3. Use Language SQL within chunk code</h4>
+<ul>
+<li><p>We can use he curly braces <code>{}</code> to denote code chunks. Within these code chunks, you can specify the language of the code using the syntax</p></li>
+<li><p><code>{sql, connection=conn}</code> indicates a SQL code chunk with additional parameters, such as specifying a connection object (conn in this case).</p></li>
+</ul>
+<section id="general" class="level5">
+<h5 class="anchored" data-anchor-id="general">General</h5>
+<ul>
+<li><p>Case does not matter (i.e.&nbsp;<code>select</code> is the same as <code>SELECT</code> is the same as <code>SeLeCt</code>), but it is standard to have all statements be in UPPERCASE (i.e.&nbsp;<code>SELECT</code>).</p></li>
+<li><p>The statements below <strong>must</strong> be in the following order: <code>SELECT</code>, <code>FROM</code>, <code>WHERE</code>, <code>GROUP BY</code>, <code>ORDER BY</code>.</p></li>
+<li><p><strong>New lines and white space don’t matter</strong>. But it is common to put those five commands above on new lines.</p></li>
+<li><p><strong>Character values must be in single quotes.</strong></p></li>
+<li><p>You can use <strong>invalid variable names</strong> by putting them in double quotes (same as using backticks in R).</p>
+<ul>
+<li>Some folks always use double quotes because it is not always clear what is an invalid variable name in the database management system.</li>
+</ul></li>
+<li><p>Comments in SQL have two hyphens <code>--</code>.</p></li>
+<li><p>Make sure to put a semicolon <code>;</code> at the end of a SQL statement. This will allow you to have multiple SQL queries in one chunk.</p></li>
+</ul>
+</section>
+<section id="showing-tables" class="level5">
+<h5 class="anchored" data-anchor-id="showing-tables">Showing Tables</h5>
+<ul>
+<li><p>The <code>SHOW TABLES</code> command can be used to get a list of all of the tables</p>
+<p><mark style="background-color: #e24e2f">SQL</mark></p></li>
+</ul>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb62"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a>            SHOW <span class="kw">TABLEs</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>5 records</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">name</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">airlines</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">airports</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">flights</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">planes</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">weather</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<ul>
+<li><p>The <code>DESCRIBE</code> command can be used to show tables and the variables.</p>
+<p><mark style="background-color: #e24e2f">SQL</mark></p></li>
+</ul>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb63"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a>            DESCRIBE;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>5 records</caption>
+<colgroup>
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 55%">
+<col style="width: 38%">
+<col style="width: 1%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">database</th>
+<th style="text-align: left;">schema</th>
+<th style="text-align: left;">name</th>
+<th style="text-align: left;">column_names</th>
+<th style="text-align: left;">column_types</th>
+<th style="text-align: left;">temporary</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">flights</td>
+<td style="text-align: left;">main</td>
+<td style="text-align: left;">airlines</td>
+<td style="text-align: left;">carrier, name</td>
+<td style="text-align: left;">VARCHAR, VARCHAR</td>
+<td style="text-align: left;">FALSE</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">flights</td>
+<td style="text-align: left;">main</td>
+<td style="text-align: left;">airports</td>
+<td style="text-align: left;">faa , name , lat , lon , alt , tz , dst , tzone</td>
+<td style="text-align: left;">VARCHAR, VARCHAR, DOUBLE , DOUBLE , DOUBLE , DOUBLE , VARCHAR, VARCHAR</td>
+<td style="text-align: left;">FALSE</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">flights</td>
+<td style="text-align: left;">main</td>
+<td style="text-align: left;">flights</td>
+<td style="text-align: left;">year , month , day , dep_time , sched_dep_time, dep_delay , arr_time , sched_arr_time, arr_delay , carrier , flight , tailnum , origin , dest , air_time , distance , hour , minute , time_hour</td>
+<td style="text-align: left;">INTEGER , INTEGER , INTEGER , INTEGER , INTEGER , DOUBLE , INTEGER , INTEGER , DOUBLE , VARCHAR , INTEGER , VARCHAR , VARCHAR , VARCHAR , DOUBLE , DOUBLE , DOUBLE , DOUBLE , TIMESTAMP</td>
+<td style="text-align: left;">FALSE</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">flights</td>
+<td style="text-align: left;">main</td>
+<td style="text-align: left;">planes</td>
+<td style="text-align: left;">tailnum , year , type , manufacturer, model , engines , seats , speed , engine</td>
+<td style="text-align: left;">VARCHAR, INTEGER, VARCHAR, VARCHAR, VARCHAR, INTEGER, INTEGER, INTEGER, VARCHAR</td>
+<td style="text-align: left;">FALSE</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">flights</td>
+<td style="text-align: left;">main</td>
+<td style="text-align: left;">weather</td>
+<td style="text-align: left;">origin , year , month , day , hour , temp , dewp , humid , wind_dir , wind_speed, wind_gust , precip , pressure , visib , time_hour</td>
+<td style="text-align: left;">VARCHAR , INTEGER , INTEGER , INTEGER , INTEGER , DOUBLE , DOUBLE , DOUBLE , DOUBLE , DOUBLE , DOUBLE , DOUBLE , DOUBLE , DOUBLE , TIMESTAMP</td>
+<td style="text-align: left;">FALSE</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre><code>&lt;mark style="background-color: #e24e2f"&gt;SQL&lt;/mark&gt;</code></pre>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb65"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a>            DESCRIBE airports;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>8 records</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">column_name</th>
+<th style="text-align: left;">column_type</th>
+<th style="text-align: left;">null</th>
+<th style="text-align: left;">key</th>
+<th style="text-align: left;">default</th>
+<th style="text-align: left;">extra</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">faa</td>
+<td style="text-align: left;">VARCHAR</td>
+<td style="text-align: left;">YES</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">name</td>
+<td style="text-align: left;">VARCHAR</td>
+<td style="text-align: left;">YES</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">lat</td>
+<td style="text-align: left;">DOUBLE</td>
+<td style="text-align: left;">YES</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">lon</td>
+<td style="text-align: left;">DOUBLE</td>
+<td style="text-align: left;">YES</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">alt</td>
+<td style="text-align: left;">DOUBLE</td>
+<td style="text-align: left;">YES</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">tz</td>
+<td style="text-align: left;">DOUBLE</td>
+<td style="text-align: left;">YES</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">dst</td>
+<td style="text-align: left;">VARCHAR</td>
+<td style="text-align: left;">YES</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">tzone</td>
+<td style="text-align: left;">VARCHAR</td>
+<td style="text-align: left;">YES</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="select-specific-columns-1" class="level5">
+<h5 class="anchored" data-anchor-id="select-specific-columns-1">Select Specific Columns</h5>
+<ul>
+<li><p>To get the columns from a data frame, use the <code>SELECT</code> command.</p></li>
+<li><p>The syntax is like this</p>
+<p><mark style="background-color: #e24e2f">SQL</mark></p></li>
+</ul>
+<div class="sourceCode" id="cb66"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a>    <span class="kw">SELECT</span> <span class="op">&lt;</span>column1<span class="op">&gt;</span>, <span class="op">&lt;</span>column2<span class="op">&gt;</span>, <span class="op">&lt;</span>column3<span class="op">&gt;</span> </span>
+<span id="cb66-2"><a href="#cb66-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">FROM</span> <span class="op">&lt;</span>mytable<span class="op">&gt;</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li><p>Let’s use this to get the <code>tzone</code>, and <code>name</code>variables from the <code>airports</code> table.</p>
+<p><mark style="background-color: #e24e2f">SQL</mark></p></li>
+</ul>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb67"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb67-1"><a href="#cb67-1" aria-hidden="true" tabindex="-1"></a>    <span class="kw">SELECT</span> <span class="ot">"tzone"</span>, <span class="ot">"name"</span></span>
+<span id="cb67-2"><a href="#cb67-2" aria-hidden="true" tabindex="-1"></a>     <span class="kw">FROM</span> <span class="ot">"airports"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Displaying records 1 - 10</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">tzone</th>
+<th style="text-align: left;">name</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">America/New_York</td>
+<td style="text-align: left;">Lansdowne Airport</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">America/Chicago</td>
+<td style="text-align: left;">Moton Field Municipal Airport</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">America/Chicago</td>
+<td style="text-align: left;">Schaumburg Regional</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">America/New_York</td>
+<td style="text-align: left;">Randall Airport</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">America/New_York</td>
+<td style="text-align: left;">Jekyll Island Airport</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">America/New_York</td>
+<td style="text-align: left;">Elizabethton Municipal Airport</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">America/New_York</td>
+<td style="text-align: left;">Williams County Airport</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">America/New_York</td>
+<td style="text-align: left;">Finger Lakes Regional Airport</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">America/New_York</td>
+<td style="text-align: left;">Shoestring Aviation Airfield</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">America/Los_Angeles</td>
+<td style="text-align: left;">Jefferson County Intl</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>In SQL, queries are not placed within quotation marks when written directly.</p>
+<p>However, SQL requires invalid variable names to be enclosed in quotation marks. Some folks always use double quotes because it is not always clear what is an invalid variable name in the database management system (DBMS).</p>
+<p>Additionally, character string values in SQL must be enclosed in single quotation marks (<code>'</code>), not double quotation marks (<code>"</code>).</p>
+<p>In R, the <code>#</code> symbol is used to indicate comments, whereas in SQL, comments can be defined using <code>--</code> for single-line comments.</p>
+<p><mark style="background-color: #e24e2f">SQL</mark></p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb68"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb68-1"><a href="#cb68-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- names are valid so can be written without quotation marks</span></span>
+<span id="cb68-2"><a href="#cb68-2" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> tzone, name</span>
+<span id="cb68-3"><a href="#cb68-3" aria-hidden="true" tabindex="-1"></a> <span class="kw">FROM</span> airports</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Displaying records 1 - 10</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">tzone</th>
+<th style="text-align: left;">name</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">America/New_York</td>
+<td style="text-align: left;">Lansdowne Airport</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">America/Chicago</td>
+<td style="text-align: left;">Moton Field Municipal Airport</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">America/Chicago</td>
+<td style="text-align: left;">Schaumburg Regional</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">America/New_York</td>
+<td style="text-align: left;">Randall Airport</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">America/New_York</td>
+<td style="text-align: left;">Jekyll Island Airport</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">America/New_York</td>
+<td style="text-align: left;">Elizabethton Municipal Airport</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">America/New_York</td>
+<td style="text-align: left;">Williams County Airport</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">America/New_York</td>
+<td style="text-align: left;">Finger Lakes Regional Airport</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">America/New_York</td>
+<td style="text-align: left;">Shoestring Aviation Airfield</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">America/Los_Angeles</td>
+<td style="text-align: left;">Jefferson County Intl</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<ul>
+<li><p>We select every column by using <code>*</code> (Wild card):</p>
+<p><mark style="background-color: #e24e2f">SQL</mark></p></li>
+</ul>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb69"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb69-1"><a href="#cb69-1" aria-hidden="true" tabindex="-1"></a>        <span class="kw">SELECT</span> <span class="op">*</span> </span>
+<span id="cb69-2"><a href="#cb69-2" aria-hidden="true" tabindex="-1"></a>        <span class="kw">FROM</span> airports;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Displaying records 1 - 10</caption>
+<colgroup>
+<col style="width: 4%">
+<col style="width: 35%">
+<col style="width: 10%">
+<col style="width: 12%">
+<col style="width: 5%">
+<col style="width: 3%">
+<col style="width: 4%">
+<col style="width: 22%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">faa</th>
+<th style="text-align: left;">name</th>
+<th style="text-align: right;">lat</th>
+<th style="text-align: right;">lon</th>
+<th style="text-align: right;">alt</th>
+<th style="text-align: right;">tz</th>
+<th style="text-align: left;">dst</th>
+<th style="text-align: left;">tzone</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">04G</td>
+<td style="text-align: left;">Lansdowne Airport</td>
+<td style="text-align: right;">41.13047</td>
+<td style="text-align: right;">-80.61958</td>
+<td style="text-align: right;">1044</td>
+<td style="text-align: right;">-5</td>
+<td style="text-align: left;">A</td>
+<td style="text-align: left;">America/New_York</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">06A</td>
+<td style="text-align: left;">Moton Field Municipal Airport</td>
+<td style="text-align: right;">32.46057</td>
+<td style="text-align: right;">-85.68003</td>
+<td style="text-align: right;">264</td>
+<td style="text-align: right;">-6</td>
+<td style="text-align: left;">A</td>
+<td style="text-align: left;">America/Chicago</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">06C</td>
+<td style="text-align: left;">Schaumburg Regional</td>
+<td style="text-align: right;">41.98934</td>
+<td style="text-align: right;">-88.10124</td>
+<td style="text-align: right;">801</td>
+<td style="text-align: right;">-6</td>
+<td style="text-align: left;">A</td>
+<td style="text-align: left;">America/Chicago</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">06N</td>
+<td style="text-align: left;">Randall Airport</td>
+<td style="text-align: right;">41.43191</td>
+<td style="text-align: right;">-74.39156</td>
+<td style="text-align: right;">523</td>
+<td style="text-align: right;">-5</td>
+<td style="text-align: left;">A</td>
+<td style="text-align: left;">America/New_York</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">09J</td>
+<td style="text-align: left;">Jekyll Island Airport</td>
+<td style="text-align: right;">31.07447</td>
+<td style="text-align: right;">-81.42778</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">-5</td>
+<td style="text-align: left;">A</td>
+<td style="text-align: left;">America/New_York</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">0A9</td>
+<td style="text-align: left;">Elizabethton Municipal Airport</td>
+<td style="text-align: right;">36.37122</td>
+<td style="text-align: right;">-82.17342</td>
+<td style="text-align: right;">1593</td>
+<td style="text-align: right;">-5</td>
+<td style="text-align: left;">A</td>
+<td style="text-align: left;">America/New_York</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">0G6</td>
+<td style="text-align: left;">Williams County Airport</td>
+<td style="text-align: right;">41.46731</td>
+<td style="text-align: right;">-84.50678</td>
+<td style="text-align: right;">730</td>
+<td style="text-align: right;">-5</td>
+<td style="text-align: left;">A</td>
+<td style="text-align: left;">America/New_York</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">0G7</td>
+<td style="text-align: left;">Finger Lakes Regional Airport</td>
+<td style="text-align: right;">42.88356</td>
+<td style="text-align: right;">-76.78123</td>
+<td style="text-align: right;">492</td>
+<td style="text-align: right;">-5</td>
+<td style="text-align: left;">A</td>
+<td style="text-align: left;">America/New_York</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">0P2</td>
+<td style="text-align: left;">Shoestring Aviation Airfield</td>
+<td style="text-align: right;">39.79482</td>
+<td style="text-align: right;">-76.64719</td>
+<td style="text-align: right;">1000</td>
+<td style="text-align: right;">-5</td>
+<td style="text-align: left;">U</td>
+<td style="text-align: left;">America/New_York</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">0S9</td>
+<td style="text-align: left;">Jefferson County Intl</td>
+<td style="text-align: right;">48.05381</td>
+<td style="text-align: right;">-122.81064</td>
+<td style="text-align: right;">108</td>
+<td style="text-align: right;">-8</td>
+<td style="text-align: left;">A</td>
+<td style="text-align: left;">America/Los_Angeles</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="filter-rows" class="level3">
+<h3 class="anchored" data-anchor-id="filter-rows">Filter rows</h3>
+<p><mark style="background-color: #e24e2f">R</mark></p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb70"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dbListFields</span>(conn, <span class="st">"flights"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] "year"           "month"          "day"            "dep_time"      
+ [5] "sched_dep_time" "dep_delay"      "arr_time"       "sched_arr_time"
+ [9] "arr_delay"      "carrier"        "flight"         "tailnum"       
+[13] "origin"         "dest"           "air_time"       "distance"      
+[17] "hour"           "minute"         "time_hour"     </code></pre>
+</div>
+</div>
+<ul>
+<li><p>You use the <code>WHERE</code> command in SQL to filter by rows.</p>
+<p><mark style="background-color: #e24e2f">SQL</mark></p></li>
+</ul>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb72"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb72-1"><a href="#cb72-1" aria-hidden="true" tabindex="-1"></a>        <span class="kw">SELECT</span> <span class="ot">"flight"</span>, <span class="ot">"distance"</span>, <span class="ot">"origin"</span>, <span class="ot">"dest"</span> </span>
+<span id="cb72-2"><a href="#cb72-2" aria-hidden="true" tabindex="-1"></a>        <span class="kw">FROM</span> flights    </span>
+<span id="cb72-3"><a href="#cb72-3" aria-hidden="true" tabindex="-1"></a>        <span class="kw">WHERE</span> <span class="ot">"distance"</span> <span class="op">&lt;</span> <span class="dv">50</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>1 records</caption>
+<thead>
+<tr class="header">
+<th style="text-align: right;">flight</th>
+<th style="text-align: right;">distance</th>
+<th style="text-align: left;">origin</th>
+<th style="text-align: left;">dest</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">1632</td>
+<td style="text-align: right;">17</td>
+<td style="text-align: left;">EWR</td>
+<td style="text-align: left;">LGA</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p><mark style="background-color: #e24e2f">R</mark></p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb73"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb73-1"><a href="#cb73-1" aria-hidden="true" tabindex="-1"></a>   <span class="st">"SELECT flight, distance, origin, dest</span></span>
+<span id="cb73-2"><a href="#cb73-2" aria-hidden="true" tabindex="-1"></a><span class="st">    FROM flights"</span> <span class="sc">%&gt;%</span> </span>
+<span id="cb73-3"><a href="#cb73-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">dbGetQuery</span>(conn, .) <span class="sc">%&gt;%</span> </span>
+<span id="cb73-4"><a href="#cb73-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  flight distance origin dest
+1   1545     1400    EWR  IAH
+2   1714     1416    LGA  IAH
+3   1141     1089    JFK  MIA
+4    725     1576    JFK  BQN
+5    461      762    LGA  ATL
+6   1696      719    EWR  ORD</code></pre>
+</div>
+</div>
+<ul>
+<li><p>To test for equality, you just use one equals sign.</p>
+<p><mark style="background-color: #e24e2f">SQL</mark></p></li>
+</ul>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb75"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb75-1"><a href="#cb75-1" aria-hidden="true" tabindex="-1"></a>        <span class="kw">SELECT</span> <span class="ot">"flight"</span>, <span class="ot">"month"</span> </span>
+<span id="cb75-2"><a href="#cb75-2" aria-hidden="true" tabindex="-1"></a>        <span class="kw">FROM</span> flights</span>
+<span id="cb75-3"><a href="#cb75-3" aria-hidden="true" tabindex="-1"></a>        <span class="kw">WHERE</span> <span class="ot">"month"</span> <span class="op">=</span> <span class="dv">12</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Displaying records 1 - 10</caption>
+<thead>
+<tr class="header">
+<th style="text-align: right;">flight</th>
+<th style="text-align: right;">month</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">745</td>
+<td style="text-align: right;">12</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">839</td>
+<td style="text-align: right;">12</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">1895</td>
+<td style="text-align: right;">12</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">1487</td>
+<td style="text-align: right;">12</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">2243</td>
+<td style="text-align: right;">12</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">939</td>
+<td style="text-align: right;">12</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">3819</td>
+<td style="text-align: right;">12</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">1441</td>
+<td style="text-align: right;">12</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">2167</td>
+<td style="text-align: right;">12</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">605</td>
+<td style="text-align: right;">12</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<ul>
+<li><p>For characters you <strong>must use single quotes</strong>, not double.</p>
+<p><mark style="background-color: #e24e2f">SQL</mark></p></li>
+</ul>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb76"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb76-1"><a href="#cb76-1" aria-hidden="true" tabindex="-1"></a>        <span class="kw">SELECT</span> <span class="ot">"flight"</span>, <span class="ot">"origin"</span> </span>
+<span id="cb76-2"><a href="#cb76-2" aria-hidden="true" tabindex="-1"></a>        <span class="kw">FROM</span> flights</span>
+<span id="cb76-3"><a href="#cb76-3" aria-hidden="true" tabindex="-1"></a>        <span class="kw">WHERE</span> <span class="ot">"origin"</span> <span class="op">=</span> <span class="st">'JFK'</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Displaying records 1 - 10</caption>
+<thead>
+<tr class="header">
+<th style="text-align: right;">flight</th>
+<th style="text-align: left;">origin</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">1141</td>
+<td style="text-align: left;">JFK</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">725</td>
+<td style="text-align: left;">JFK</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">79</td>
+<td style="text-align: left;">JFK</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">49</td>
+<td style="text-align: left;">JFK</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">71</td>
+<td style="text-align: left;">JFK</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">194</td>
+<td style="text-align: left;">JFK</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">1806</td>
+<td style="text-align: left;">JFK</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">1743</td>
+<td style="text-align: left;">JFK</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">303</td>
+<td style="text-align: left;">JFK</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">135</td>
+<td style="text-align: left;">JFK</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<ul>
+<li><p>You can select multiple criteria using the <code>AND</code> command</p>
+<p><mark style="background-color: #e24e2f">SQL</mark></p></li>
+</ul>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb77"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb77-1"><a href="#cb77-1" aria-hidden="true" tabindex="-1"></a>        <span class="kw">SELECT</span> <span class="ot">"flight"</span>, <span class="ot">"origin"</span>, <span class="ot">"dest"</span> </span>
+<span id="cb77-2"><a href="#cb77-2" aria-hidden="true" tabindex="-1"></a>        <span class="kw">FROM</span> flights</span>
+<span id="cb77-3"><a href="#cb77-3" aria-hidden="true" tabindex="-1"></a>        <span class="kw">WHERE</span> <span class="ot">"origin"</span> <span class="op">=</span> <span class="st">'JFK'</span> <span class="kw">AND</span> <span class="ot">"dest"</span> <span class="op">=</span> <span class="st">'CMH'</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Displaying records 1 - 10</caption>
+<thead>
+<tr class="header">
+<th style="text-align: right;">flight</th>
+<th style="text-align: left;">origin</th>
+<th style="text-align: left;">dest</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">4146</td>
+<td style="text-align: left;">JFK</td>
+<td style="text-align: left;">CMH</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">3783</td>
+<td style="text-align: left;">JFK</td>
+<td style="text-align: left;">CMH</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">4146</td>
+<td style="text-align: left;">JFK</td>
+<td style="text-align: left;">CMH</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">3783</td>
+<td style="text-align: left;">JFK</td>
+<td style="text-align: left;">CMH</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">4146</td>
+<td style="text-align: left;">JFK</td>
+<td style="text-align: left;">CMH</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">3783</td>
+<td style="text-align: left;">JFK</td>
+<td style="text-align: left;">CMH</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">4146</td>
+<td style="text-align: left;">JFK</td>
+<td style="text-align: left;">CMH</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">3783</td>
+<td style="text-align: left;">JFK</td>
+<td style="text-align: left;">CMH</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">4146</td>
+<td style="text-align: left;">JFK</td>
+<td style="text-align: left;">CMH</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">3650</td>
+<td style="text-align: left;">JFK</td>
+<td style="text-align: left;">CMH</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<ul>
+<li><p>You can use the <code>OR</code> logical operator too. Just put parentheses around your desired order of operations.</p>
+<p><mark style="background-color: #e24e2f">SQL</mark></p></li>
+</ul>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb78"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb78-1"><a href="#cb78-1" aria-hidden="true" tabindex="-1"></a>            <span class="kw">SELECT</span> <span class="ot">"flight"</span>, <span class="ot">"origin"</span>, <span class="ot">"dest"</span> </span>
+<span id="cb78-2"><a href="#cb78-2" aria-hidden="true" tabindex="-1"></a>            <span class="kw">FROM</span> flights</span>
+<span id="cb78-3"><a href="#cb78-3" aria-hidden="true" tabindex="-1"></a>            <span class="kw">WHERE</span> (<span class="ot">"origin"</span> <span class="op">=</span> <span class="st">'JFK'</span> <span class="kw">OR</span> <span class="ot">"origin"</span> <span class="op">=</span> <span class="st">'LGA'</span>) <span class="kw">AND</span> dest <span class="op">=</span> <span class="st">'CMH'</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Displaying records 1 - 10</caption>
+<thead>
+<tr class="header">
+<th style="text-align: right;">flight</th>
+<th style="text-align: left;">origin</th>
+<th style="text-align: left;">dest</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">4490</td>
+<td style="text-align: left;">LGA</td>
+<td style="text-align: left;">CMH</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">4485</td>
+<td style="text-align: left;">LGA</td>
+<td style="text-align: left;">CMH</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">4426</td>
+<td style="text-align: left;">LGA</td>
+<td style="text-align: left;">CMH</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">4429</td>
+<td style="text-align: left;">LGA</td>
+<td style="text-align: left;">CMH</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">4146</td>
+<td style="text-align: left;">JFK</td>
+<td style="text-align: left;">CMH</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">4626</td>
+<td style="text-align: left;">LGA</td>
+<td style="text-align: left;">CMH</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">4555</td>
+<td style="text-align: left;">LGA</td>
+<td style="text-align: left;">CMH</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">3783</td>
+<td style="text-align: left;">JFK</td>
+<td style="text-align: left;">CMH</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">4490</td>
+<td style="text-align: left;">LGA</td>
+<td style="text-align: left;">CMH</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">4485</td>
+<td style="text-align: left;">LGA</td>
+<td style="text-align: left;">CMH</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<ul>
+<li><p>Missing data is <code>NULL</code> in SQL (instead of <code>NA</code>). We can remove them by the special command:</p>
+<p><mark style="background-color: #e24e2f">SQL</mark></p></li>
+</ul>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb79"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb79-1"><a href="#cb79-1" aria-hidden="true" tabindex="-1"></a>            <span class="kw">SELECT</span> <span class="ot">"flight"</span>, <span class="ot">"dep_delay"</span> </span>
+<span id="cb79-2"><a href="#cb79-2" aria-hidden="true" tabindex="-1"></a>            <span class="kw">FROM</span> flights</span>
+<span id="cb79-3"><a href="#cb79-3" aria-hidden="true" tabindex="-1"></a>            <span class="kw">WHERE</span> <span class="ot">"dep_delay"</span> <span class="kw">IS</span> <span class="kw">NOT</span> <span class="kw">NULL</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Displaying records 1 - 10</caption>
+<thead>
+<tr class="header">
+<th style="text-align: right;">flight</th>
+<th style="text-align: right;">dep_delay</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">1545</td>
+<td style="text-align: right;">2</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">1714</td>
+<td style="text-align: right;">4</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">1141</td>
+<td style="text-align: right;">2</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">725</td>
+<td style="text-align: right;">-1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">461</td>
+<td style="text-align: right;">-6</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">1696</td>
+<td style="text-align: right;">-4</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">507</td>
+<td style="text-align: right;">-5</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">5708</td>
+<td style="text-align: right;">-3</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">79</td>
+<td style="text-align: right;">-3</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">301</td>
+<td style="text-align: right;">-2</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<ul>
+<li><p>Just use <code>IS</code> if you want only the missing data observations</p>
+<p><mark style="background-color: #e24e2f">SQL</mark></p></li>
+</ul>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb80"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb80-1"><a href="#cb80-1" aria-hidden="true" tabindex="-1"></a>            <span class="kw">SELECT</span> <span class="ot">"flight"</span>, <span class="ot">"dep_delay"</span> </span>
+<span id="cb80-2"><a href="#cb80-2" aria-hidden="true" tabindex="-1"></a>            <span class="kw">FROM</span> flights</span>
+<span id="cb80-3"><a href="#cb80-3" aria-hidden="true" tabindex="-1"></a>            <span class="kw">WHERE</span> <span class="ot">"dep_delay"</span> <span class="kw">IS</span> <span class="kw">NULL</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Displaying records 1 - 10</caption>
+<thead>
+<tr class="header">
+<th style="text-align: right;">flight</th>
+<th style="text-align: right;">dep_delay</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">4308</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">791</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">1925</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">125</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">4352</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">4406</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">4434</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">4935</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">3849</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">133</td>
+<td style="text-align: right;">NA</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<ul>
+<li><p>When you are building a query, you often want to subset the rows while you are finishing it (you don’t want to return the whole table each time you are trouble shooting a query). Use <code>LIMIT</code> to show only the top subset.</p>
+<p><mark style="background-color: #e24e2f">SQL</mark></p></li>
+</ul>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb81"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb81-1"><a href="#cb81-1" aria-hidden="true" tabindex="-1"></a>            <span class="kw">SELECT</span> <span class="ot">"flight"</span>, <span class="ot">"origin"</span>, <span class="ot">"dest"</span> </span>
+<span id="cb81-2"><a href="#cb81-2" aria-hidden="true" tabindex="-1"></a>            <span class="kw">FROM</span> flights</span>
+<span id="cb81-3"><a href="#cb81-3" aria-hidden="true" tabindex="-1"></a>            <span class="kw">LIMIT</span> <span class="dv">5</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>5 records</caption>
+<thead>
+<tr class="header">
+<th style="text-align: right;">flight</th>
+<th style="text-align: left;">origin</th>
+<th style="text-align: left;">dest</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">1545</td>
+<td style="text-align: left;">EWR</td>
+<td style="text-align: left;">IAH</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">1714</td>
+<td style="text-align: left;">LGA</td>
+<td style="text-align: left;">IAH</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">1141</td>
+<td style="text-align: left;">JFK</td>
+<td style="text-align: left;">MIA</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">725</td>
+<td style="text-align: left;">JFK</td>
+<td style="text-align: left;">BQN</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">461</td>
+<td style="text-align: left;">LGA</td>
+<td style="text-align: left;">ATL</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<ul>
+<li>You can also randomly sample rows via <code>USING SAMPLE</code>:</li>
+</ul>
+<p><mark style="background-color: #e24e2f">SQL</mark></p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb82"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb82-1"><a href="#cb82-1" aria-hidden="true" tabindex="-1"></a>        <span class="kw">SELECT</span> <span class="ot">"flight"</span>, <span class="ot">"origin"</span>, <span class="ot">"dest"</span> </span>
+<span id="cb82-2"><a href="#cb82-2" aria-hidden="true" tabindex="-1"></a>        <span class="kw">FROM</span> flights</span>
+<span id="cb82-3"><a href="#cb82-3" aria-hidden="true" tabindex="-1"></a>        <span class="kw">USING</span> <span class="kw">SAMPLE</span> <span class="dv">5</span> <span class="kw">ROWS</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>5 records</caption>
+<thead>
+<tr class="header">
+<th style="text-align: right;">flight</th>
+<th style="text-align: left;">origin</th>
+<th style="text-align: left;">dest</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">1186</td>
+<td style="text-align: left;">EWR</td>
+<td style="text-align: left;">MIA</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">1000</td>
+<td style="text-align: left;">EWR</td>
+<td style="text-align: left;">MIA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">1197</td>
+<td style="text-align: left;">EWR</td>
+<td style="text-align: left;">LAS</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">1433</td>
+<td style="text-align: left;">LGA</td>
+<td style="text-align: left;">CLT</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">209</td>
+<td style="text-align: left;">JFK</td>
+<td style="text-align: left;">LGB</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="arranging-rows" class="level2">
+<h2 class="anchored" data-anchor-id="arranging-rows">Arranging Rows</h2>
+<ul>
+<li><p>Use <code>ORDER BY</code> to rearrange the rows (let’s remove missing values so we can see the ordering)</p>
+<p><mark style="background-color: #e24e2f">SQL</mark></p></li>
+</ul>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb83"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb83-1"><a href="#cb83-1" aria-hidden="true" tabindex="-1"></a>            <span class="kw">SELECT</span> <span class="ot">"flight"</span>, <span class="ot">"dep_delay"</span> </span>
+<span id="cb83-2"><a href="#cb83-2" aria-hidden="true" tabindex="-1"></a>            <span class="kw">FROM</span> flights</span>
+<span id="cb83-3"><a href="#cb83-3" aria-hidden="true" tabindex="-1"></a>            <span class="kw">WHERE</span> <span class="ot">"dep_delay"</span> <span class="kw">IS</span> <span class="kw">NOT</span> <span class="kw">NULL</span></span>
+<span id="cb83-4"><a href="#cb83-4" aria-hidden="true" tabindex="-1"></a>            <span class="kw">ORDER</span> <span class="kw">BY</span> <span class="ot">"dep_delay"</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Displaying records 1 - 10</caption>
+<thead>
+<tr class="header">
+<th style="text-align: right;">flight</th>
+<th style="text-align: right;">dep_delay</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">97</td>
+<td style="text-align: right;">-43</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">1715</td>
+<td style="text-align: right;">-33</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">5713</td>
+<td style="text-align: right;">-32</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">1435</td>
+<td style="text-align: right;">-30</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">837</td>
+<td style="text-align: right;">-27</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">3478</td>
+<td style="text-align: right;">-26</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">4361</td>
+<td style="text-align: right;">-25</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">4573</td>
+<td style="text-align: right;">-25</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">3318</td>
+<td style="text-align: right;">-24</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">375</td>
+<td style="text-align: right;">-24</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<ul>
+<li><p>Use <code>DESC</code> after the variable to arrange in descending order</p>
+<p><mark style="background-color: #e24e2f">SQL</mark></p></li>
+</ul>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb84"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb84-1"><a href="#cb84-1" aria-hidden="true" tabindex="-1"></a>            <span class="kw">SELECT</span> <span class="ot">"flight"</span>, <span class="ot">"dep_delay"</span> </span>
+<span id="cb84-2"><a href="#cb84-2" aria-hidden="true" tabindex="-1"></a>            <span class="kw">FROM</span> flights</span>
+<span id="cb84-3"><a href="#cb84-3" aria-hidden="true" tabindex="-1"></a>            <span class="kw">WHERE</span> dep_delay <span class="kw">IS</span> <span class="kw">NOT</span> <span class="kw">NULL</span></span>
+<span id="cb84-4"><a href="#cb84-4" aria-hidden="true" tabindex="-1"></a>            <span class="kw">ORDER</span> <span class="kw">BY</span> <span class="ot">"dep_delay"</span> <span class="kw">DESC</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Displaying records 1 - 10</caption>
+<thead>
+<tr class="header">
+<th style="text-align: right;">flight</th>
+<th style="text-align: right;">dep_delay</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">51</td>
+<td style="text-align: right;">1301</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">3535</td>
+<td style="text-align: right;">1137</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">3695</td>
+<td style="text-align: right;">1126</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">177</td>
+<td style="text-align: right;">1014</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">3075</td>
+<td style="text-align: right;">1005</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">2391</td>
+<td style="text-align: right;">960</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">2119</td>
+<td style="text-align: right;">911</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">2007</td>
+<td style="text-align: right;">899</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">2047</td>
+<td style="text-align: right;">898</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">172</td>
+<td style="text-align: right;">896</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<ul>
+<li><p>You break ties by adding more variables in the <code>ORDER BY</code> statement</p>
+<p><mark style="background-color: #e24e2f">SQL</mark></p></li>
+</ul>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb85"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb85-1"><a href="#cb85-1" aria-hidden="true" tabindex="-1"></a>            <span class="kw">SELECT</span> <span class="ot">"flight"</span>, <span class="ot">"origin"</span>, <span class="ot">"dep_delay"</span> </span>
+<span id="cb85-2"><a href="#cb85-2" aria-hidden="true" tabindex="-1"></a>            <span class="kw">FROM</span> <span class="ot">"flights"</span></span>
+<span id="cb85-3"><a href="#cb85-3" aria-hidden="true" tabindex="-1"></a>            <span class="kw">WHERE</span> <span class="ot">"dep_delay"</span> <span class="kw">IS</span> <span class="kw">NOT</span> <span class="kw">NULL</span></span>
+<span id="cb85-4"><a href="#cb85-4" aria-hidden="true" tabindex="-1"></a>            <span class="kw">ORDER</span> <span class="kw">BY</span> <span class="ot">"origin"</span> <span class="kw">DESC</span>, <span class="ot">"dep_delay"</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Displaying records 1 - 10</caption>
+<thead>
+<tr class="header">
+<th style="text-align: right;">flight</th>
+<th style="text-align: left;">origin</th>
+<th style="text-align: right;">dep_delay</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">1715</td>
+<td style="text-align: left;">LGA</td>
+<td style="text-align: right;">-33</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">5713</td>
+<td style="text-align: left;">LGA</td>
+<td style="text-align: right;">-32</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">1435</td>
+<td style="text-align: left;">LGA</td>
+<td style="text-align: right;">-30</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">837</td>
+<td style="text-align: left;">LGA</td>
+<td style="text-align: right;">-27</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">3478</td>
+<td style="text-align: left;">LGA</td>
+<td style="text-align: right;">-26</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">4573</td>
+<td style="text-align: left;">LGA</td>
+<td style="text-align: right;">-25</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">375</td>
+<td style="text-align: left;">LGA</td>
+<td style="text-align: right;">-24</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">4065</td>
+<td style="text-align: left;">LGA</td>
+<td style="text-align: right;">-24</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">2223</td>
+<td style="text-align: left;">LGA</td>
+<td style="text-align: right;">-24</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">5956</td>
+<td style="text-align: left;">LGA</td>
+<td style="text-align: right;">-23</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="mutate" class="level2">
+<h2 class="anchored" data-anchor-id="mutate">Mutate</h2>
+<ul>
+<li><p>In SQL, you mutate variables while you SELECT. You use <code>AS</code> to specify what the new variable is called (choosing a variable name is called “aliasing” in SQL).</p>
+<p><mark style="background-color: #e24e2f">SQL</mark></p></li>
+</ul>
+<div class="sourceCode" id="cb86"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb86-1"><a href="#cb86-1" aria-hidden="true" tabindex="-1"></a>    <span class="kw">SELECT</span> <span class="op">&lt;</span>expression<span class="op">&gt;</span> <span class="kw">AS</span> <span class="op">&lt;</span>myvariable<span class="op">&gt;</span> </span>
+<span id="cb86-2"><a href="#cb86-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">FROM</span> <span class="op">&lt;</span>mytable<span class="op">&gt;</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li><p>Let’s calculate average speed from the <code>flights</code> table. We’ll also keep the flight number, distance, and air time variables.</p>
+<p><mark style="background-color: #e24e2f">SQL</mark></p></li>
+</ul>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb87"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb87-1"><a href="#cb87-1" aria-hidden="true" tabindex="-1"></a>            <span class="kw">SELECT</span> <span class="ot">"flight"</span>, <span class="ot">"distance"</span> <span class="op">/</span> <span class="ot">"air_time"</span> <span class="kw">AS</span> <span class="ot">"speed"</span>, <span class="ot">"distance"</span>, <span class="ot">"air_time"</span> </span>
+<span id="cb87-2"><a href="#cb87-2" aria-hidden="true" tabindex="-1"></a>            <span class="kw">FROM</span> flights;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Displaying records 1 - 10</caption>
+<thead>
+<tr class="header">
+<th style="text-align: right;">flight</th>
+<th style="text-align: right;">speed</th>
+<th style="text-align: right;">distance</th>
+<th style="text-align: right;">air_time</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">1545</td>
+<td style="text-align: right;">6.167401</td>
+<td style="text-align: right;">1400</td>
+<td style="text-align: right;">227</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">1714</td>
+<td style="text-align: right;">6.237885</td>
+<td style="text-align: right;">1416</td>
+<td style="text-align: right;">227</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">1141</td>
+<td style="text-align: right;">6.806250</td>
+<td style="text-align: right;">1089</td>
+<td style="text-align: right;">160</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">725</td>
+<td style="text-align: right;">8.612022</td>
+<td style="text-align: right;">1576</td>
+<td style="text-align: right;">183</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">461</td>
+<td style="text-align: right;">6.568966</td>
+<td style="text-align: right;">762</td>
+<td style="text-align: right;">116</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">1696</td>
+<td style="text-align: right;">4.793333</td>
+<td style="text-align: right;">719</td>
+<td style="text-align: right;">150</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">507</td>
+<td style="text-align: right;">6.740506</td>
+<td style="text-align: right;">1065</td>
+<td style="text-align: right;">158</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">5708</td>
+<td style="text-align: right;">4.320755</td>
+<td style="text-align: right;">229</td>
+<td style="text-align: right;">53</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">79</td>
+<td style="text-align: right;">6.742857</td>
+<td style="text-align: right;">944</td>
+<td style="text-align: right;">140</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">301</td>
+<td style="text-align: right;">5.311594</td>
+<td style="text-align: right;">733</td>
+<td style="text-align: right;">138</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<section id="joining" class="level3">
+<h3 class="anchored" data-anchor-id="joining">Joining</h3>
+<ul>
+<li><p>For joining, in the <code>SELECT</code> call, you write out all of the columns in <strong>both</strong> tables that you are joining.</p></li>
+<li><p>If there are shared column names, you need to distinguish between the two via <code>table1."var"</code> or <code>table2."var"</code> etc…</p></li>
+<li><p>Use <code>LEFT JOIN</code> to declare a left join, and <code>ON</code> to declare the keys.</p>
+<p><mark style="background-color: #e24e2f">SQL</mark></p></li>
+</ul>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb88"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb88-1"><a href="#cb88-1" aria-hidden="true" tabindex="-1"></a>        <span class="co">-- Get column names for the planes table</span></span>
+<span id="cb88-2"><a href="#cb88-2" aria-hidden="true" tabindex="-1"></a>        <span class="kw">SELECT</span> column_name</span>
+<span id="cb88-3"><a href="#cb88-3" aria-hidden="true" tabindex="-1"></a>        <span class="kw">FROM</span> information_schema.<span class="kw">columns</span></span>
+<span id="cb88-4"><a href="#cb88-4" aria-hidden="true" tabindex="-1"></a>        <span class="kw">WHERE</span> table_name <span class="op">=</span> <span class="st">'planes'</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>9 records</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">column_name</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">tailnum</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">year</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">type</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">manufacturer</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">model</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">engines</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">seats</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">speed</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">engine</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre><code>&lt;mark style="background-color: lightblue"&gt;R&lt;/mark&gt;</code></pre>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb90"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb90-1"><a href="#cb90-1" aria-hidden="true" tabindex="-1"></a>    <span class="fu">dbListFields</span>(conn, <span class="st">"planes"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "tailnum"      "year"         "type"         "manufacturer" "model"       
+[6] "engines"      "seats"        "speed"        "engine"      </code></pre>
+</div>
+</div>
+<pre><code>&lt;mark style="background-color: #e24e2f"&gt;SQL&lt;/mark&gt;</code></pre>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb93"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb93-1"><a href="#cb93-1" aria-hidden="true" tabindex="-1"></a>        <span class="co">-- Get column names for the flights table</span></span>
+<span id="cb93-2"><a href="#cb93-2" aria-hidden="true" tabindex="-1"></a>        <span class="kw">SELECT</span> column_name</span>
+<span id="cb93-3"><a href="#cb93-3" aria-hidden="true" tabindex="-1"></a>        <span class="kw">FROM</span> information_schema.<span class="kw">columns</span></span>
+<span id="cb93-4"><a href="#cb93-4" aria-hidden="true" tabindex="-1"></a>        <span class="kw">WHERE</span> table_name <span class="op">=</span> <span class="st">'flights'</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Displaying records 1 - 10</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">column_name</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">year</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">month</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">day</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">dep_time</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">sched_dep_time</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">dep_delay</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">arr_time</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">sched_arr_time</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">arr_delay</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">carrier</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre><code>&lt;mark style="background-color: lightblue"&gt;R&lt;/mark&gt;</code></pre>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb95"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb95-1"><a href="#cb95-1" aria-hidden="true" tabindex="-1"></a>    <span class="fu">dbListFields</span>(conn, <span class="st">"flights"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] "year"           "month"          "day"            "dep_time"      
+ [5] "sched_dep_time" "dep_delay"      "arr_time"       "sched_arr_time"
+ [9] "arr_delay"      "carrier"        "flight"         "tailnum"       
+[13] "origin"         "dest"           "air_time"       "distance"      
+[17] "hour"           "minute"         "time_hour"     </code></pre>
+</div>
+</div>
+<ul>
+<li>Let us Join them with the key <code>tailnum</code></li>
+</ul>
+<section id="left-join" class="level4">
+<h4 class="anchored" data-anchor-id="left-join">LEFT JOIN</h4>
+<pre><code>&lt;mark style="background-color: #e24e2f"&gt;SQL&lt;/mark&gt;</code></pre>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb98"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb98-1"><a href="#cb98-1" aria-hidden="true" tabindex="-1"></a>    <span class="co">-- flight is from the flights table</span></span>
+<span id="cb98-2"><a href="#cb98-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">-- type is from the planes table</span></span>
+<span id="cb98-3"><a href="#cb98-3" aria-hidden="true" tabindex="-1"></a>    <span class="co">-- both tables have a tailnum column, so we need to tell them apart</span></span>
+<span id="cb98-4"><a href="#cb98-4" aria-hidden="true" tabindex="-1"></a>    <span class="co">-- if you list both tailnums in SELECT, you'll get two tailnum columns</span></span>
+<span id="cb98-5"><a href="#cb98-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">SELECT</span> <span class="ot">"flight"</span>, flights.<span class="ot">"tailnum"</span>, <span class="ot">"type"</span> </span>
+<span id="cb98-6"><a href="#cb98-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">FROM</span> flights</span>
+<span id="cb98-7"><a href="#cb98-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">LEFT</span> <span class="kw">JOIN</span> planes</span>
+<span id="cb98-8"><a href="#cb98-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">ON</span> flights.<span class="ot">"tailnum"</span> <span class="op">=</span> planes.<span class="ot">"tailnum"</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Displaying records 1 - 10</caption>
+<thead>
+<tr class="header">
+<th style="text-align: right;">flight</th>
+<th style="text-align: left;">tailnum</th>
+<th style="text-align: left;">type</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">1545</td>
+<td style="text-align: left;">N14228</td>
+<td style="text-align: left;">Fixed wing multi engine</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">1714</td>
+<td style="text-align: left;">N24211</td>
+<td style="text-align: left;">Fixed wing multi engine</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">1141</td>
+<td style="text-align: left;">N619AA</td>
+<td style="text-align: left;">Fixed wing multi engine</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">725</td>
+<td style="text-align: left;">N804JB</td>
+<td style="text-align: left;">Fixed wing multi engine</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">461</td>
+<td style="text-align: left;">N668DN</td>
+<td style="text-align: left;">Fixed wing multi engine</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">1696</td>
+<td style="text-align: left;">N39463</td>
+<td style="text-align: left;">Fixed wing multi engine</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">507</td>
+<td style="text-align: left;">N516JB</td>
+<td style="text-align: left;">Fixed wing multi engine</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">5708</td>
+<td style="text-align: left;">N829AS</td>
+<td style="text-align: left;">Fixed wing multi engine</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">79</td>
+<td style="text-align: left;">N593JB</td>
+<td style="text-align: left;">Fixed wing multi engine</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">49</td>
+<td style="text-align: left;">N793JB</td>
+<td style="text-align: left;">Fixed wing multi engine</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="right-join" class="level4">
+<h4 class="anchored" data-anchor-id="right-join">RIGHT JOIN</h4>
+<pre><code>&lt;mark style="background-color: #e24e2f"&gt;SQL&lt;/mark&gt;</code></pre>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb100"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb100-1"><a href="#cb100-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb100-2"><a href="#cb100-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">SELECT</span> <span class="ot">"flight"</span>, flights.<span class="ot">"tailnum"</span>, <span class="ot">"type"</span> </span>
+<span id="cb100-3"><a href="#cb100-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">FROM</span> flights</span>
+<span id="cb100-4"><a href="#cb100-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">RIGHT</span> <span class="kw">JOIN</span> planes</span>
+<span id="cb100-5"><a href="#cb100-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">ON</span> flights.<span class="ot">"tailnum"</span> <span class="op">=</span> planes.<span class="ot">"tailnum"</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Displaying records 1 - 10</caption>
+<thead>
+<tr class="header">
+<th style="text-align: right;">flight</th>
+<th style="text-align: left;">tailnum</th>
+<th style="text-align: left;">type</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">1545</td>
+<td style="text-align: left;">N14228</td>
+<td style="text-align: left;">Fixed wing multi engine</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">1714</td>
+<td style="text-align: left;">N24211</td>
+<td style="text-align: left;">Fixed wing multi engine</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">1141</td>
+<td style="text-align: left;">N619AA</td>
+<td style="text-align: left;">Fixed wing multi engine</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">725</td>
+<td style="text-align: left;">N804JB</td>
+<td style="text-align: left;">Fixed wing multi engine</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">461</td>
+<td style="text-align: left;">N668DN</td>
+<td style="text-align: left;">Fixed wing multi engine</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">1696</td>
+<td style="text-align: left;">N39463</td>
+<td style="text-align: left;">Fixed wing multi engine</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">507</td>
+<td style="text-align: left;">N516JB</td>
+<td style="text-align: left;">Fixed wing multi engine</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">5708</td>
+<td style="text-align: left;">N829AS</td>
+<td style="text-align: left;">Fixed wing multi engine</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">79</td>
+<td style="text-align: left;">N593JB</td>
+<td style="text-align: left;">Fixed wing multi engine</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">49</td>
+<td style="text-align: left;">N793JB</td>
+<td style="text-align: left;">Fixed wing multi engine</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="full-join" class="level4">
+<h4 class="anchored" data-anchor-id="full-join">FULL JOIN</h4>
+<pre><code>&lt;mark style="background-color: #e24e2f"&gt;SQL&lt;/mark&gt;</code></pre>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb102"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb102-1"><a href="#cb102-1" aria-hidden="true" tabindex="-1"></a>    <span class="kw">SELECT</span> <span class="ot">"flight"</span>, flights.<span class="ot">"tailnum"</span>, <span class="ot">"type"</span> </span>
+<span id="cb102-2"><a href="#cb102-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">FROM</span> flights</span>
+<span id="cb102-3"><a href="#cb102-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">JOIN</span> planes</span>
+<span id="cb102-4"><a href="#cb102-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">ON</span> flights.<span class="ot">"tailnum"</span> <span class="op">=</span> planes.<span class="ot">"tailnum"</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Displaying records 1 - 10</caption>
+<thead>
+<tr class="header">
+<th style="text-align: right;">flight</th>
+<th style="text-align: left;">tailnum</th>
+<th style="text-align: left;">type</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">461</td>
+<td style="text-align: left;">N693DL</td>
+<td style="text-align: left;">Fixed wing multi engine</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">569</td>
+<td style="text-align: left;">N846UA</td>
+<td style="text-align: left;">Fixed wing multi engine</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">4424</td>
+<td style="text-align: left;">N19966</td>
+<td style="text-align: left;">Fixed wing multi engine</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">6177</td>
+<td style="text-align: left;">N34111</td>
+<td style="text-align: left;">Fixed wing multi engine</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">731</td>
+<td style="text-align: left;">N319NB</td>
+<td style="text-align: left;">Fixed wing multi engine</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">684</td>
+<td style="text-align: left;">N809UA</td>
+<td style="text-align: left;">Fixed wing multi engine</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">1279</td>
+<td style="text-align: left;">N328NB</td>
+<td style="text-align: left;">Fixed wing multi engine</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">1691</td>
+<td style="text-align: left;">N34137</td>
+<td style="text-align: left;">Fixed wing multi engine</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">1447</td>
+<td style="text-align: left;">N117UW</td>
+<td style="text-align: left;">Fixed wing multi engine</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">583</td>
+<td style="text-align: left;">N632JB</td>
+<td style="text-align: left;">Fixed wing multi engine</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre><code>&lt;mark style="background-color: #e24e2f"&gt;SQL&lt;/mark&gt;</code></pre>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb104"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb104-1"><a href="#cb104-1" aria-hidden="true" tabindex="-1"></a>    <span class="kw">SELECT</span> <span class="ot">"flight"</span>, flights.<span class="ot">"tailnum"</span>, <span class="ot">"type"</span> </span>
+<span id="cb104-2"><a href="#cb104-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">FROM</span> flights</span>
+<span id="cb104-3"><a href="#cb104-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">FULL</span> <span class="kw">JOIN</span> planes</span>
+<span id="cb104-4"><a href="#cb104-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">ON</span> flights.<span class="ot">"tailnum"</span> <span class="op">=</span> planes.<span class="ot">"tailnum"</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Displaying records 1 - 10</caption>
+<thead>
+<tr class="header">
+<th style="text-align: right;">flight</th>
+<th style="text-align: left;">tailnum</th>
+<th style="text-align: left;">type</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">461</td>
+<td style="text-align: left;">N693DL</td>
+<td style="text-align: left;">Fixed wing multi engine</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">569</td>
+<td style="text-align: left;">N846UA</td>
+<td style="text-align: left;">Fixed wing multi engine</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">4424</td>
+<td style="text-align: left;">N19966</td>
+<td style="text-align: left;">Fixed wing multi engine</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">6177</td>
+<td style="text-align: left;">N34111</td>
+<td style="text-align: left;">Fixed wing multi engine</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">731</td>
+<td style="text-align: left;">N319NB</td>
+<td style="text-align: left;">Fixed wing multi engine</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">684</td>
+<td style="text-align: left;">N809UA</td>
+<td style="text-align: left;">Fixed wing multi engine</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">1279</td>
+<td style="text-align: left;">N328NB</td>
+<td style="text-align: left;">Fixed wing multi engine</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">1691</td>
+<td style="text-align: left;">N34137</td>
+<td style="text-align: left;">Fixed wing multi engine</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">1447</td>
+<td style="text-align: left;">N117UW</td>
+<td style="text-align: left;">Fixed wing multi engine</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">583</td>
+<td style="text-align: left;">N632JB</td>
+<td style="text-align: left;">Fixed wing multi engine</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+</section>
+</section>
+</section>
+<section id="lazy-evaluation-in-sql" class="level1">
+<h1>Lazy Evaluation in SQL</h1>
+<p>Lazy evaluation in SQL (especially when using databases like DuckDB in R) means that queries are not executed immediately but instead are deferred until needed. This improves performance by avoiding unnecessary computations and reducing memory usage.</p>
+<section id="key-concept-in-r-with-sql" class="level2">
+<h2 class="anchored" data-anchor-id="key-concept-in-r-with-sql">Key Concept in R with SQL</h2>
+<ul>
+<li><p>When you use <code>{dplyr}</code> with <code>tbl(con, "table_name")</code>, it creates a reference to the table but does not fetch data immediately.</p></li>
+<li><p>The actual SQL execution happens only when you call <code>collect()</code>, which pulls the results into R as a data frame.</p></li>
+</ul>
+</section>
+<section id="example-with-filter-in-lazy-evaluation" class="level2">
+<h2 class="anchored" data-anchor-id="example-with-filter-in-lazy-evaluation">Example with <code>filter()</code> in Lazy Evaluation:</h2>
+<p>Suppose you want to filter the <code>"airports"</code> table to only include airports in the <code>tzone</code> “America/New_York”. The query won’t run until you call <code>collect()</code>.</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb105"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb105-1"><a href="#cb105-1" aria-hidden="true" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">tbl</span>(conn, <span class="st">"airports"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb105-2"><a href="#cb105-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(tzone <span class="sc">==</span> <span class="st">"America/New_York"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb105-3"><a href="#cb105-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(tzone, name) <span class="sc">%&gt;%</span></span>
+<span id="cb105-4"><a href="#cb105-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect</span>()</span>
+<span id="cb105-5"><a href="#cb105-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb105-6"><a href="#cb105-6" aria-hidden="true" tabindex="-1"></a><span class="co"># View the result</span></span>
+<span id="cb105-7"><a href="#cb105-7" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(result)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 2
+  tzone            name                          
+  &lt;chr&gt;            &lt;chr&gt;                         
+1 America/New_York Lansdowne Airport             
+2 America/New_York Randall Airport               
+3 America/New_York Jekyll Island Airport         
+4 America/New_York Elizabethton Municipal Airport
+5 America/New_York Williams County Airport       
+6 America/New_York Finger Lakes Regional Airport </code></pre>
+</div>
+</div>
+</section>
+<section id="step-by-step-breakdown" class="level2">
+<h2 class="anchored" data-anchor-id="step-by-step-breakdown"><strong>Step-by-Step Breakdown:</strong></h2>
+<ol type="1">
+<li><strong><code>tbl(conn, "airports")</code></strong><br>
+</li>
+</ol>
+<ul>
+<li>Creates a lazy reference to the <code>"airports"</code> table in the database. No data is loaded yet.</li>
+</ul>
+<ol start="2" type="1">
+<li><strong><code>filter(tzone == "America/New_York")</code></strong><br>
+</li>
+</ol>
+<ul>
+<li>Adds a <strong>filter condition</strong> to only include rows where the <code>tzone</code> is <code>"America/New_York"</code>.<br>
+</li>
+<li>The query is still not executed, it’s just being built.</li>
+</ul>
+<ol start="3" type="1">
+<li><strong><code>select(tzone, name)</code></strong><br>
+</li>
+</ol>
+<ul>
+<li>Adds a <strong>selection</strong> to retrieve only the <code>tzone</code> and <code>name</code> columns.<br>
+</li>
+<li>Still, <strong>no execution</strong> happens.</li>
+</ul>
+<ol start="4" type="1">
+<li><strong><code>collect()</code></strong><br>
+</li>
+</ol>
+<ul>
+<li>This is where the <strong>SQL query is executed</strong>.<br>
+</li>
+<li>The query that is run on the database looks like:<br>
+</li>
+</ul>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb107"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb107-1"><a href="#cb107-1" aria-hidden="true" tabindex="-1"></a>     <span class="kw">SELECT</span> tzone, name <span class="kw">FROM</span> airports <span class="kw">WHERE</span> tzone <span class="op">=</span> <span class="st">'America/New_York'</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Displaying records 1 - 10</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">tzone</th>
+<th style="text-align: left;">name</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">America/New_York</td>
+<td style="text-align: left;">Lansdowne Airport</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">America/New_York</td>
+<td style="text-align: left;">Randall Airport</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">America/New_York</td>
+<td style="text-align: left;">Jekyll Island Airport</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">America/New_York</td>
+<td style="text-align: left;">Elizabethton Municipal Airport</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">America/New_York</td>
+<td style="text-align: left;">Williams County Airport</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">America/New_York</td>
+<td style="text-align: left;">Finger Lakes Regional Airport</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">America/New_York</td>
+<td style="text-align: left;">Shoestring Aviation Airfield</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">America/New_York</td>
+<td style="text-align: left;">Harford County Airport</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">America/New_York</td>
+<td style="text-align: left;">Port Bucyrus-Crawford County Airport</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">America/New_York</td>
+<td style="text-align: left;">Jackson County Airport</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<ul>
+<li>Only the filtered data is collected and returned as a data frame in R.</li>
+</ul>
+<section id="why-this-is-efficient" class="level3">
+<h3 class="anchored" data-anchor-id="why-this-is-efficient"><strong>Why This is Efficient:</strong></h3>
+<ul>
+<li><p><strong>Lazy Evaluation</strong> ensures that the data isn’t fetched or filtered until necessary, saving memory and time, especially with large datasets.</p></li>
+<li><p>The <strong>SQL engine</strong> can optimize the query before it runs, which can improve performance.</p></li>
+</ul>
+<hr>
+</section>
+<section id="key-point" class="level3">
+<h3 class="anchored" data-anchor-id="key-point"><strong>Key Point:</strong></h3>
+<p>Until <code>collect()</code> is called, the query is just a plan—<strong>no data is retrieved</strong> from the database until that point. The result is only calculated when needed, improving efficiency.</p>
+</section>
+</section>
+</section>
+<section id="count" class="level1">
+<h1>COUNT</h1>
+<section id="example-count-the-number-of-time-zones-from-airports-table." class="level4">
+<h4 class="anchored" data-anchor-id="example-count-the-number-of-time-zones-from-airports-table.">Example: Count the number of time zones from <code>airports</code> table.</h4>
+<p>We want to count the number of individual flights associated with time zones.&nbsp;</p>
+<ol type="1">
+<li>Select the <code>tzone</code> column<br>
+</li>
+<li>count each row (<code>*</code>) associated with <code>tzone</code><br>
+</li>
+<li>We get this from the <code>airports</code> table&nbsp;</li>
+<li>We need to group them by <code>tzone</code><br>
+</li>
+</ol>
+<p>Everything must be inside of the quotation marks.</p>
+<pre><code>&lt;mark style="background-color: lightblue"&gt;R&lt;/mark&gt;</code></pre>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb109"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb109-1"><a href="#cb109-1" aria-hidden="true" tabindex="-1"></a>count_airports <span class="ot">&lt;-</span> <span class="st">"SELECT tzone,</span></span>
+<span id="cb109-2"><a href="#cb109-2" aria-hidden="true" tabindex="-1"></a><span class="st">                 COUNT(*)</span></span>
+<span id="cb109-3"><a href="#cb109-3" aria-hidden="true" tabindex="-1"></a><span class="st">                 From airports</span></span>
+<span id="cb109-4"><a href="#cb109-4" aria-hidden="true" tabindex="-1"></a><span class="st">                 GROUP BY tzone"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="there-are-three-ways-to-run-this-query-1" class="level2">
+<h2 class="anchored" data-anchor-id="there-are-three-ways-to-run-this-query-1">There are three ways to run this query</h2>
+<p><strong>1. Use the function <code>dbGetQuery()</code> from {DBI} package.</strong></p>
+<ul>
+<li>Now let us run <code>dbGetQuery()</code> function</li>
+</ul>
+<section id="count_tzone" class="level4">
+<h4 class="anchored" data-anchor-id="count_tzone"><code>count_tzone</code></h4>
+<pre><code>&lt;mark style="background-color: lightblue"&gt;R&lt;/mark&gt;</code></pre>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb111"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb111-1"><a href="#cb111-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dbGetQuery</span>(conn, count_airports) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                 tzone count_star()
+1     Pacific/Honolulu           18
+2       America/Denver          119
+3      America/Chicago          342
+4                 &lt;NA&gt;            3
+5    America/Vancouver            2
+6       Asia/Chongqing            2
+7  America/Los_Angeles          176
+8      America/Phoenix           38
+9    America/Anchorage          239
+10    America/New_York          519</code></pre>
+</div>
+</div>
+<p>It will get run in database, the count for each time zone are totaled and it will get returned to R as a dataframe. So this is actually a dataframe that was passed back to R and if we store it , then it will be ready when we need it.</p>
+<ul>
+<li><p>Or directly</p>
+<p><mark style="background-color: lightblue">R</mark></p></li>
+</ul>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb113"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb113-1"><a href="#cb113-1" aria-hidden="true" tabindex="-1"></a>    <span class="st">"SELECT tzone,</span></span>
+<span id="cb113-2"><a href="#cb113-2" aria-hidden="true" tabindex="-1"></a><span class="st">                     COUNT(*)</span></span>
+<span id="cb113-3"><a href="#cb113-3" aria-hidden="true" tabindex="-1"></a><span class="st">                     From airports</span></span>
+<span id="cb113-4"><a href="#cb113-4" aria-hidden="true" tabindex="-1"></a><span class="st">                     GROUP BY tzone"</span> <span class="sc">%&gt;%</span> </span>
+<span id="cb113-5"><a href="#cb113-5" aria-hidden="true" tabindex="-1"></a>      <span class="fu">dbGetQuery</span>(conn, .)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                 tzone count_star()
+1     America/New_York          519
+2     Pacific/Honolulu           18
+3    America/Anchorage          239
+4    America/Vancouver            2
+5       Asia/Chongqing            2
+6  America/Los_Angeles          176
+7      America/Phoenix           38
+8       America/Denver          119
+9      America/Chicago          342
+10                &lt;NA&gt;            3</code></pre>
+</div>
+</div>
+<p><strong>2a. We can use <code>tbl()</code> from {<code>dplyr</code>} with <code>sql()</code></strong></p>
+<pre><code>&lt;mark style="background-color: lightblue"&gt;R&lt;/mark&gt;</code></pre>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb116"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb116-1"><a href="#cb116-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tbl</span>(conn, <span class="fu">sql</span>(count_airports))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># Source:   SQL [?? x 2]
+# Database: DuckDB v1.3.1 [semiyari@Windows 10 x64:R 4.5.2/C:\Users\semiyari\Desktop\ds_spring26\data\flights.duckdb]
+   tzone               `count_star()`
+   &lt;chr&gt;                        &lt;dbl&gt;
+ 1 America/Anchorage              239
+ 2 America/Vancouver                2
+ 3 Asia/Chongqing                   2
+ 4 America/Denver                 119
+ 5 Pacific/Honolulu                18
+ 6 America/Los_Angeles            176
+ 7 America/Phoenix                 38
+ 8 America/New_York               519
+ 9 America/Chicago                342
+10 &lt;NA&gt;                             3</code></pre>
+</div>
+</div>
+<p>This will create a table similar to one we had in method 1. The difference is the <code>dbGetQuery()</code> returns a dataframe back to R. <code>tbl()</code> function actually leaves the result table still in the database. And we can see it R does not know how many rows there. on the top of the table you will see something similar to</p>
+<div class="cell" data-layout-align="center">
+<p>Source:SQL [?? x 2]</p>
+</div>
+<p>If we want to get the resul of that query back to R we need to use <code>collect()</code> function</p>
+<pre><code>&lt;mark style="background-color: lightblue"&gt;R&lt;/mark&gt;</code></pre>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb119"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb119-1"><a href="#cb119-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tbl</span>(conn, <span class="fu">sql</span>(count_airports)) <span class="sc">%&gt;%</span></span>
+<span id="cb119-2"><a href="#cb119-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 10 × 2
+   tzone               `count_star()`
+   &lt;chr&gt;                        &lt;dbl&gt;
+ 1 America/Chicago                342
+ 2 &lt;NA&gt;                             3
+ 3 America/New_York               519
+ 4 America/Denver                 119
+ 5 America/Anchorage              239
+ 6 America/Los_Angeles            176
+ 7 America/Phoenix                 38
+ 8 America/Vancouver                2
+ 9 Asia/Chongqing                   2
+10 Pacific/Honolulu                18</code></pre>
+</div>
+</div>
+<p>Now it will return the data as a datafram into R.</p>
+<ul>
+<li>We also can get it directly by</li>
+</ul>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb121"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb121-1"><a href="#cb121-1" aria-hidden="true" tabindex="-1"></a><span class="st">"SELECT tzone,</span></span>
+<span id="cb121-2"><a href="#cb121-2" aria-hidden="true" tabindex="-1"></a><span class="st">                 COUNT(*)</span></span>
+<span id="cb121-3"><a href="#cb121-3" aria-hidden="true" tabindex="-1"></a><span class="st">                 From airports</span></span>
+<span id="cb121-4"><a href="#cb121-4" aria-hidden="true" tabindex="-1"></a><span class="st">                 GROUP BY tzone"</span> <span class="sc">%&gt;%</span> </span>
+<span id="cb121-5"><a href="#cb121-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sql</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb121-6"><a href="#cb121-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tbl</span>(conn, .) <span class="sc">%&gt;%</span> </span>
+<span id="cb121-7"><a href="#cb121-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 10 × 2
+   tzone               `count_star()`
+   &lt;chr&gt;                        &lt;dbl&gt;
+ 1 America/Anchorage              239
+ 2 America/Los_Angeles            176
+ 3 America/Phoenix                 38
+ 4 America/Vancouver                2
+ 5 Asia/Chongqing                   2
+ 6 Pacific/Honolulu                18
+ 7 America/Denver                 119
+ 8 America/New_York               519
+ 9 America/Chicago                342
+10 &lt;NA&gt;                             3</code></pre>
+</div>
+</div>
+<p><strong>2b. We can use <code>tbl()</code> from {<code>dplyr</code>} with its functions</strong></p>
+<p>If you are familiar with dplyr and not very comfortable with SQL, you may want using database connection with dplyr commands inside of the database.</p>
+<p>Let us we want to count the time zone in flights data frame.</p>
+<ul>
+<li><p>We start with creating a connection to an individal table ( or multiple tables) using <code>tbl()</code></p></li>
+<li><p>We create a linked version of table in R. The first argument is the connection we made and the second is the name of the table we want to connect to.</p></li>
+</ul>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb123"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb123-1"><a href="#cb123-1" aria-hidden="true" tabindex="-1"></a>airports_table <span class="ot">&lt;-</span> <span class="fu">tbl</span>(conn, <span class="st">"airports"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb124"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb124-1"><a href="#cb124-1" aria-hidden="true" tabindex="-1"></a>airports_table <span class="sc">%&gt;%</span> </span>
+<span id="cb124-2"><a href="#cb124-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># Source:   table&lt;airports&gt; [?? x 8]
+# Database: DuckDB v1.3.1 [semiyari@Windows 10 x64:R 4.5.2/C:\Users\semiyari\Desktop\ds_spring26\data\flights.duckdb]
+   faa   name                             lat    lon   alt    tz dst   tzone    
+   &lt;chr&gt; &lt;chr&gt;                          &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt;    
+ 1 04G   Lansdowne Airport               41.1  -80.6  1044    -5 A     America/…
+ 2 06A   Moton Field Municipal Airport   32.5  -85.7   264    -6 A     America/…
+ 3 06C   Schaumburg Regional             42.0  -88.1   801    -6 A     America/…
+ 4 06N   Randall Airport                 41.4  -74.4   523    -5 A     America/…
+ 5 09J   Jekyll Island Airport           31.1  -81.4    11    -5 A     America/…
+ 6 0A9   Elizabethton Municipal Airport  36.4  -82.2  1593    -5 A     America/…
+ 7 0G6   Williams County Airport         41.5  -84.5   730    -5 A     America/…
+ 8 0G7   Finger Lakes Regional Airport   42.9  -76.8   492    -5 A     America/…
+ 9 0P2   Shoestring Aviation Airfield    39.8  -76.6  1000    -5 U     America/…
+10 0S9   Jefferson County Intl           48.1 -123.    108    -8 A     America/…
+# ℹ more rows</code></pre>
+</div>
+</div>
+<ul>
+<li><p>Now we have the connection we can do exactly what we did in {dplyr}</p></li>
+<li><p>Remember in {dplyr} we gorup by things first</p></li>
+</ul>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb126"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb126-1"><a href="#cb126-1" aria-hidden="true" tabindex="-1"></a>airports_table <span class="sc">%&gt;%</span></span>
+<span id="cb126-2"><a href="#cb126-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(tzone) <span class="sc">%&gt;%</span></span>
+<span id="cb126-3"><a href="#cb126-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">count =</span> <span class="fu">n</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># Source:   SQL [?? x 2]
+# Database: DuckDB v1.3.1 [semiyari@Windows 10 x64:R 4.5.2/C:\Users\semiyari\Desktop\ds_spring26\data\flights.duckdb]
+   tzone               count
+   &lt;chr&gt;               &lt;dbl&gt;
+ 1 America/Anchorage     239
+ 2 America/Denver        119
+ 3 America/Vancouver       2
+ 4 Asia/Chongqing          2
+ 5 Pacific/Honolulu       18
+ 6 America/Los_Angeles   176
+ 7 America/Phoenix        38
+ 8 America/Chicago       342
+ 9 &lt;NA&gt;                    3
+10 America/New_York      519</code></pre>
+</div>
+</div>
+<ul>
+<li><p>We see the same output that we had before. If you look closely at the table, you will see the number of rows are not known.</p></li>
+<li><p>Once <strong>{dplyr}</strong> detects the connection (<code>conn</code>), it automatically knows you’re working with a database and will translate the <code>filter()</code>, <code>group_by()</code>, and <code>summarise()</code> operations into the appropriate <strong>SQL</strong> commands instead of running them in R.</p></li>
+<li><p>The benefit of working in the database caused the faster performance (without using R memory) Also without knowing SQL, we just use {dplyr} functions.</p></li>
+<li><p>As you can see the number of rows is unknown. The reason is, R just has the first few observations and it does not know how many is there. To bring back data to R we need to do one additional step , which was applying the <code>collect()</code> function</p></li>
+</ul>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb128"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb128-1"><a href="#cb128-1" aria-hidden="true" tabindex="-1"></a>airports_table <span class="sc">%&gt;%</span></span>
+<span id="cb128-2"><a href="#cb128-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(tzone) <span class="sc">%&gt;%</span></span>
+<span id="cb128-3"><a href="#cb128-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">count =</span> <span class="fu">n</span>()) <span class="sc">%&gt;%</span></span>
+<span id="cb128-4"><a href="#cb128-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect</span>() <span class="ot">-&gt;</span> count_tzone</span>
+<span id="cb128-5"><a href="#cb128-5" aria-hidden="true" tabindex="-1"></a>count_tzone <span class="sc">%&gt;%</span> </span>
+<span id="cb128-6"><a href="#cb128-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 10 × 2
+   tzone               count
+   &lt;chr&gt;               &lt;dbl&gt;
+ 1 America/Anchorage     239
+ 2 America/Los_Angeles   176
+ 3 America/Phoenix        38
+ 4 America/Denver        119
+ 5 America/Chicago       342
+ 6 &lt;NA&gt;                    3
+ 7 Pacific/Honolulu       18
+ 8 America/Vancouver       2
+ 9 Asia/Chongqing          2
+10 America/New_York      519</code></pre>
+</div>
+</div>
+<section id="copying-data-from-r-to-the-database" class="level5">
+<h5 class="anchored" data-anchor-id="copying-data-from-r-to-the-database">Copying data from R to the database</h5>
+<p>So far we have been reade,create data, retrieve data from database. Now we want the table that we created and add it to database. We can do this by using <code>copy_to()</code> function.</p>
+<ul>
+<li><p>Suppose we want to store the table <code>count_tzone</code> from R back to database as a permanent table.</p></li>
+<li><p>Let us look at the tables in our database just to make sure that table isn’t there.</p>
+<p><mark style="background-color: lightblue">R</mark></p></li>
+</ul>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb130"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb130-1"><a href="#cb130-1" aria-hidden="true" tabindex="-1"></a>    <span class="fu">dbListTables</span>(conn)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "airlines" "airports" "flights"  "planes"   "weather" </code></pre>
+</div>
+</div>
+<ul>
+<li>Let’s give a name to table that we have created by SQLin R.</li>
+</ul>
+<p>To store the table we use <code>copy_to()</code> function, where the first argument is the connection we made, the second argument is the table that we want to copy to database and the third argument is the name of the table on the database. By default table will be added temporary if you want it permanent you need to type <code>temporary = FALSE</code>, to store data permanently.</p>
+<ul>
+<li><p>Now let us add the <code>count_tzone</code> which we were created by {dbplyr} to database</p>
+<p><mark style="background-color: lightblue">R</mark></p></li>
+</ul>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb132"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb132-1"><a href="#cb132-1" aria-hidden="true" tabindex="-1"></a>    <span class="fu">copy_to</span>(conn, count_tzone, <span class="at">name =</span> <span class="st">"zone_count"</span>, <span class="at">overwrite =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>check to see if the table was added to database</p>
+<pre><code>&lt;mark style="background-color: lightblue"&gt;R&lt;/mark&gt;</code></pre>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb134"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb134-1"><a href="#cb134-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dbListTables</span>(conn)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "airlines"   "airports"   "flights"    "planes"     "weather"   
+[6] "zone_count"</code></pre>
+</div>
+</div>
+<ul>
+<li><p><code>tzone_c</code></p>
+<p><mark style="background-color: lightblue">R</mark></p></li>
+</ul>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb136"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb136-1"><a href="#cb136-1" aria-hidden="true" tabindex="-1"></a>    airports_table <span class="sc">%&gt;%</span></span>
+<span id="cb136-2"><a href="#cb136-2" aria-hidden="true" tabindex="-1"></a>      <span class="fu">group_by</span>(tzone) <span class="sc">%&gt;%</span></span>
+<span id="cb136-3"><a href="#cb136-3" aria-hidden="true" tabindex="-1"></a>      <span class="fu">summarise</span>(<span class="at">count =</span> <span class="fu">n</span>()) <span class="sc">%&gt;%</span></span>
+<span id="cb136-4"><a href="#cb136-4" aria-hidden="true" tabindex="-1"></a>      <span class="fu">collect</span>() <span class="ot">-&gt;</span></span>
+<span id="cb136-5"><a href="#cb136-5" aria-hidden="true" tabindex="-1"></a>      tzone_c</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb137"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb137-1"><a href="#cb137-1" aria-hidden="true" tabindex="-1"></a>tzone_c <span class="sc">%&gt;%</span> </span>
+<span id="cb137-2"><a href="#cb137-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 10 × 2
+   tzone               count
+   &lt;chr&gt;               &lt;dbl&gt;
+ 1 America/Los_Angeles   176
+ 2 America/Phoenix        38
+ 3 America/Anchorage     239
+ 4 America/New_York      519
+ 5 America/Chicago       342
+ 6 &lt;NA&gt;                    3
+ 7 America/Denver        119
+ 8 America/Vancouver       2
+ 9 Asia/Chongqing          2
+10 Pacific/Honolulu       18</code></pre>
+</div>
+</div>
+<ul>
+<li><p>Now let us add the <code>tzone_c</code> which we were created by {dbplyr} to database</p>
+<p><mark style="background-color: lightblue">R</mark></p></li>
+</ul>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb139"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb139-1"><a href="#cb139-1" aria-hidden="true" tabindex="-1"></a>    <span class="fu">copy_to</span>(conn, tzone_c, <span class="at">name =</span> <span class="st">"zone_t"</span>, <span class="at">overwrite =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>check to see if the table was added to database</p>
+<pre><code>&lt;mark style="background-color: lightblue"&gt;R&lt;/mark&gt;</code></pre>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb141"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb141-1"><a href="#cb141-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dbListTables</span>(conn)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "airlines"   "airports"   "flights"    "planes"     "weather"   
+[6] "zone_count" "zone_t"    </code></pre>
+</div>
+</div>
+</section>
+<section id="remove-a-table-from-database" class="level5">
+<h5 class="anchored" data-anchor-id="remove-a-table-from-database">Remove a table from database</h5>
+<p>We can Delete table by <code>dbRemoveTable()</code> function from {DBI} package.</p>
+<ul>
+<li><p>Let us remove the file we just added</p>
+<p><mark style="background-color: lightblue">R</mark></p></li>
+</ul>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb143"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb143-1"><a href="#cb143-1" aria-hidden="true" tabindex="-1"></a>    <span class="fu">dbRemoveTable</span>(conn, <span class="st">"zone_t"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>check to see if the table was removed from database</p>
+<pre><code>&lt;mark style="background-color: lightblue"&gt;R&lt;/mark&gt;</code></pre>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb145"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb145-1"><a href="#cb145-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dbListTables</span>(conn)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "airlines"   "airports"   "flights"    "planes"     "weather"   
+[6] "zone_count"</code></pre>
+</div>
+</div>
+<ul>
+<li><p>Now we want to remove <code>count_tzone</code> from database</p>
+<p><mark style="background-color: lightblue">R</mark></p></li>
+</ul>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb147"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb147-1"><a href="#cb147-1" aria-hidden="true" tabindex="-1"></a>    <span class="fu">dbRemoveTable</span>(conn, <span class="st">"zone_count"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<ul>
+<li><p>Let us to check if it was deleted</p>
+<p><mark style="background-color: lightblue">R</mark></p></li>
+</ul>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb148"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb148-1"><a href="#cb148-1" aria-hidden="true" tabindex="-1"></a>    <span class="fu">dbListTables</span>(conn)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "airlines" "airports" "flights"  "planes"   "weather" </code></pre>
+</div>
+</div>
+<pre><code>&lt;mark style="background-color: lightblue"&gt;R&lt;/mark&gt;</code></pre>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb151"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb151-1"><a href="#cb151-1" aria-hidden="true" tabindex="-1"></a>    <span class="fu">dbListFields</span>(conn, <span class="st">"flights"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] "year"           "month"          "day"            "dep_time"      
+ [5] "sched_dep_time" "dep_delay"      "arr_time"       "sched_arr_time"
+ [9] "arr_delay"      "carrier"        "flight"         "tailnum"       
+[13] "origin"         "dest"           "air_time"       "distance"      
+[17] "hour"           "minute"         "time_hour"     </code></pre>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="close-the-connection" class="level2">
+<h2 class="anchored" data-anchor-id="close-the-connection">Close the connection</h2>
+<pre><code>&lt;mark style="background-color: lightblue"&gt;R&lt;/mark&gt;</code></pre>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb154"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb154-1"><a href="#cb154-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dbDisconnect</span>(conn)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<ul>
+<li><p>To check if the connection is closed use the <code>dbIsValid()</code> function in R. This function returns TRUE if the connection is valid (open) and FALSE if it is closed.</p>
+<p><mark style="background-color: lightblue">R</mark></p></li>
+</ul>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb155"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb155-1"><a href="#cb155-1" aria-hidden="true" tabindex="-1"></a>    <span class="fu">dbIsValid</span>(conn)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] FALSE</code></pre>
+</div>
+</div>
+<ul>
+<li><p>Or</p>
+<p><mark style="background-color: lightblue">R</mark></p></li>
+</ul>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb157"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb157-1"><a href="#cb157-1" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Close the previous connection if it is open</span></span>
+<span id="cb157-2"><a href="#cb157-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (<span class="fu">dbIsValid</span>(conn)) {</span>
+<span id="cb157-3"><a href="#cb157-3" aria-hidden="true" tabindex="-1"></a>      <span class="fu">dbDisconnect</span>(conn)</span>
+<span id="cb157-4"><a href="#cb157-4" aria-hidden="true" tabindex="-1"></a>      <span class="fu">cat</span>(<span class="st">"Previous connection closed."</span>)</span>
+<span id="cb157-5"><a href="#cb157-5" aria-hidden="true" tabindex="-1"></a>    } <span class="cf">else</span> {</span>
+<span id="cb157-6"><a href="#cb157-6" aria-hidden="true" tabindex="-1"></a>      <span class="fu">cat</span>(<span class="st">"No active connection to close."</span>)</span>
+<span id="cb157-7"><a href="#cb157-7" aria-hidden="true" tabindex="-1"></a>    }</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>No active connection to close.</code></pre>
+</div>
+</div>
+<ul>
+<li><p>Or Check it as follow:</p>
+<p><mark style="background-color: lightblue">R</mark></p></li>
+</ul>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb159"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb159-1"><a href="#cb159-1" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Check if the connection is closed</span></span>
+<span id="cb159-2"><a href="#cb159-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (<span class="sc">!</span><span class="fu">dbIsValid</span>(conn)) {</span>
+<span id="cb159-3"><a href="#cb159-3" aria-hidden="true" tabindex="-1"></a>      <span class="fu">print</span>(<span class="st">"Connection is closed."</span>)</span>
+<span id="cb159-4"><a href="#cb159-4" aria-hidden="true" tabindex="-1"></a>    } <span class="cf">else</span> {</span>
+<span id="cb159-5"><a href="#cb159-5" aria-hidden="true" tabindex="-1"></a>      <span class="fu">print</span>(<span class="st">"Connection is open."</span>)</span>
+<span id="cb159-6"><a href="#cb159-6" aria-hidden="true" tabindex="-1"></a>    }</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Connection is closed."</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="how-about-if-we-want-to-use-rsqlite-instead-of-duckdb" class="level1">
+<h1>How about if we want to Use <code>{RSQLite}</code> instead of <code>{duckdb}</code></h1>
+<pre><code>&lt;mark style="background-color: lightblue"&gt;R&lt;/mark&gt;</code></pre>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb162"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb162-1"><a href="#cb162-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(RSQLite)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<ul>
+<li><p>To collect the file go to <a href="https://www.sqlitetutorial.net/sqlite-sample-database/">SQLITE TUTORIAL</a></p></li>
+<li><p>Scroll down to Download SQLite sample database</p></li>
+<li><p>You get a zipfile. Double click to open it and then extract the file. I put the file <code>chinook.db</code> in my data folder</p>
+<p><mark style="background-color: lightblue">R</mark></p></li>
+</ul>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb163"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb163-1"><a href="#cb163-1" aria-hidden="true" tabindex="-1"></a>    conn_sqlite <span class="ot">&lt;-</span> <span class="fu">dbConnect</span>(<span class="fu">SQLite</span>(), <span class="st">"./data/chinook.db"</span>, <span class="at">synchronous =</span> <span class="cn">NULL</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb164"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb164-1"><a href="#cb164-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dbIsValid</span>(conn_sqlite)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] TRUE</code></pre>
+</div>
+</div>
+<ul>
+<li>We just created the connection</li>
+</ul>
+<p>In the following we will get the list of tables in our database</p>
+<pre><code>&lt;mark style="background-color: lightblue"&gt;R&lt;/mark&gt;</code></pre>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb167"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb167-1"><a href="#cb167-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dbListTables</span>(conn_sqlite)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] "albums"          "artists"         "customers"       "employees"      
+ [5] "genres"          "invoice_items"   "invoices"        "media_types"    
+ [9] "playlist_track"  "playlists"       "sqlite_sequence" "sqlite_stat1"   
+[13] "tracks"         </code></pre>
+</div>
+</div>
+<p>Here is the detail of table that called <code>artists</code></p>
+<pre><code>&lt;mark style="background-color: lightblue"&gt;R&lt;/mark&gt;</code></pre>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb170"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb170-1"><a href="#cb170-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dbListFields</span>(conn_sqlite, <span class="st">"artists"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "ArtistId" "Name"    </code></pre>
+</div>
+</div>
+<pre><code>&lt;mark style="background-color: lightblue"&gt;R&lt;/mark&gt;</code></pre>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb173"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb173-1"><a href="#cb173-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dbListFields</span>(conn_sqlite, <span class="st">"customers"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] "CustomerId"   "FirstName"    "LastName"     "Company"      "Address"     
+ [6] "City"         "State"        "Country"      "PostalCode"   "Phone"       
+[11] "Fax"          "Email"        "SupportRepId"</code></pre>
+</div>
+</div>
+<pre><code>&lt;mark style="background-color: lightblue"&gt;R&lt;/mark&gt;</code></pre>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb176"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb176-1"><a href="#cb176-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dbDisconnect</span>(conn_sqlite)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<pre><code>&lt;mark style="background-color: lightblue"&gt;R&lt;/mark&gt;</code></pre>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb178"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb178-1"><a href="#cb178-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dbIsValid</span>(conn_sqlite)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] FALSE</code></pre>
+</div>
+</div>
+<section id="close-the-connection-1" class="level2">
+<h2 class="anchored" data-anchor-id="close-the-connection-1">Close the connection</h2>
+<pre><code>&lt;mark style="background-color: lightblue"&gt;R&lt;/mark&gt;</code></pre>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb181"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb181-1"><a href="#cb181-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check if the connection is closed</span></span>
+<span id="cb181-2"><a href="#cb181-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">dbIsValid</span>(conn_sqlite)) {</span>
+<span id="cb181-3"><a href="#cb181-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(<span class="st">"Connection is closed."</span>)</span>
+<span id="cb181-4"><a href="#cb181-4" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> {</span>
+<span id="cb181-5"><a href="#cb181-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(<span class="st">"Connection is open."</span>)</span>
+<span id="cb181-6"><a href="#cb181-6" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Connection is closed."</code></pre>
+</div>
+</div>
+<ul>
+<li><p><strong>Note:</strong></p>
+<ul>
+<li><p>It’s best to have SQL written in a separate file (that ends in “.sql”).</p></li>
+<li><p>If you want to load the results of a SQL query in R, saved in “query.sql”, do</p></li>
+</ul></li>
+</ul>
+<div class="cell" data-layout-align="center">
+<pre><code>mydf &lt;- DBI::dbGetQuery(conn, statement = read_file(here("query.sql")))}</code></pre>
+</div>
+</section>
+</section>
+<section id="section" class="level1">
+<h1></h1>
+</section>
+<section id="source" class="level1">
+<h1>Source</h1>
+<p><a href="https://dept.stat.lsa.umich.edu/~jerrick/courses/stat701/index.html">Source</a></p>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
