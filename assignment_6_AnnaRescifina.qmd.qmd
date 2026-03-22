@@ -110,10 +110,6 @@ dbDisconnect(conn)
 dbIsValid(conn)
 ```
 
-```{r}
-dbDisconnect(conn, shutdown = TRUE)
-```
-
 ## Part 2
 
 **2a**
