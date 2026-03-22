@@ -133,7 +133,3 @@ This query calculates the average departure delay for each month. The results sh
 ![](img_2d.png){width="250"}
 
 This query identifies the most frequent flight routes. The route from JFK to LAX has the highest number of flights, followed by routes such as LGA to ATL and LGA to ORD. This suggests that major hub-to-hub and cross-country routes experience the highest traffic volumes.
-
-**2e**
-
-The results from Part 2b were exported as a CSV file using DBeaver’s export feature. This allows the data to be used outside of the database environment and submitted as part of the assignment.
