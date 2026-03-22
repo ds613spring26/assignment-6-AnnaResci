@@ -110,4 +110,6 @@ dbDisconnect(conn)
 dbIsValid(conn)
 ```
 
-This step closes the database connection using dbDisconnect(conn). After disconnecting, dbIsValid(conn) is used to confirm that the connection is no longer active, ensuring proper resource management.
+```{r}
+dbDisconnect(conn, shutdown = TRUE)
+```
