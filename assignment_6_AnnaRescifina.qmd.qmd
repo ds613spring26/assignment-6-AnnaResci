@@ -113,3 +113,31 @@ dbIsValid(conn)
 ```{r}
 dbDisconnect(conn, shutdown = TRUE)
 ```
+
+## Part 2
+
+**2a**
+
+![](img_2a.png){width="199" height="146"}
+
+This query displays the first 10 rows of the flights dataset. It provides a preview of the structure of the data, including variables such as departure time, scheduled departure time, and date information. This helps confirm that the dataset has been loaded correctly.
+
+**2b**
+
+![This query displays the first 10 rows of the flights dataset. It provides a preview of the structure of the data, including variables such as departure time, scheduled departure time, and date information. This helps confirm that the dataset has been loaded correctly.](img_2b.png){width="211"}
+
+**2c**
+
+![](img_2c.png){width="243"}
+
+This query calculates the average departure delay for each month. The results show that delays are generally higher in the summer months, particularly June and July, suggesting seasonal congestion or weather-related disruptions. In contrast, delays are lower in months such as September, October, and November.
+
+**2d**
+
+![](img_2d.png){width="250"}
+
+This query identifies the most frequent flight routes. The route from JFK to LAX has the highest number of flights, followed by routes such as LGA to ATL and LGA to ORD. This suggests that major hub-to-hub and cross-country routes experience the highest traffic volumes.
+
+**2e**
+
+The results from Part 2b were exported as a CSV file using DBeaver’s export feature. This allows the data to be used outside of the database environment and submitted as part of the assignment.
